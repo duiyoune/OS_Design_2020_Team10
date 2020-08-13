@@ -36,10 +36,16 @@ cd /mnt
 sudo mkdir floppy
 ls(显示 floppy即可）
 ```
-
 2.根目录下:
 ``` 
 sudo apt install libc6-dev-i386
 ```
+3.将github上的OS-master复制进ubuntu
+4.在OS-master文件夹位置创建Terminal
+5.
+```
+make image
+bochs -f bochsrc
+```
 
-3.
+6.修改时，如果新建文件，需要在
