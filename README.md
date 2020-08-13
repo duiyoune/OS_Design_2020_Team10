@@ -22,7 +22,7 @@ Deadline：8.1
 | 文件系统  | 黄伟杰 |
 | 内存管理  | 马天放 |
 
-##Deadline：8.11
+## Deadline：8.11
 
 
 ------
@@ -63,4 +63,4 @@ bochs -f bochsrc
 | 小游戏  | 黄伟杰 |
 | help && 命令跳转  | 马天放 |
 
-##Deadline：8.19
+## Deadline：8.19
