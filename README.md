@@ -9,15 +9,6 @@ Deadline：8.1
 ---------
 
   
-  
-      
-        
-
-
-
-
-
-
 
 ## Mission2:分工看6-10章
 
@@ -40,10 +31,15 @@ Deadline：8.1
 
 ### 环境配置：
 1.根目录下:
-''' 
-          cd /mnt
-          sudo mkdir floppy
-          ls(显示 floppy即可）
-''' 
-2.根目录下 sudo apt install libc6-dev-i386
+```
+cd /mnt
+sudo mkdir floppy
+ls(显示 floppy即可）
+```
+
+2.根目录下:
+``` 
+sudo apt install libc6-dev-i386
+```
+
 3.
