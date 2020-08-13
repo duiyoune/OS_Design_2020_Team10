@@ -32,3 +32,18 @@ Deadline：8.1
 | 内存管理  | 马天放 |
 
 ##Deadline：8.11
+
+
+------
+
+## Mission3:开始创新
+
+### 环境配置：
+1.根目录下:
+''' 
+          cd /mnt
+          sudo mkdir floppy
+          ls(显示 floppy即可）
+''' 
+2.根目录下 sudo apt install libc6-dev-i386
+3.
