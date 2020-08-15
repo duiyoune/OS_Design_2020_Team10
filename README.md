@@ -65,7 +65,7 @@ bochs -f bochsrc
 
 
 ### 修改文件目录
-开机动画	/lib/ls.c  	
+开机动画	/lib/ls.c  
 help &&跳转： /kernel/main.c 200行  
 树状文件系统： /kernel/main.c 500行  
 小游戏：	/game/TTT.c	/include/2048Game.h  
