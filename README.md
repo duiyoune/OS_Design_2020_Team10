@@ -65,12 +65,12 @@ bochs -f bochsrc
 
 
 ### 修改文件目录
-开机动画	/lib/ls.c	
-help &&跳转： /kernel/main.c 200行
-树状文件系统： /kernel/main.c 500行
-小游戏：	/game/TTT.c	/include/2048Game.h
-进程： /kernel/main.c 0-150行	500行
-进程间通信：TestA &TestB
+开机动画	/lib/ls.c  	
+help &&跳转： /kernel/main.c 200行  
+树状文件系统： /kernel/main.c 500行  
+小游戏：	/game/TTT.c	/include/2048Game.h  
+进程： /kernel/main.c 0-150行	500行  
+进程间通信：TestA &TestB  
 
 
 ## Deadline：8.19
