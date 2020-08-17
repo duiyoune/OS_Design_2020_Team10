@@ -4,7 +4,7 @@
 1.配置环境  
 2.阅读ORANGES1-5章并跟随书完成实验  
 
-Deadline：8.1
+## Deadline：8.1
 
 ---------
 
@@ -40,7 +40,7 @@ ls(显示 floppy即可）
 ``` 
 sudo apt install libc6-dev-i386
 ```
-3.将github上的OS-master复制进ubuntu
+3.将github上的2018-OSLab-master复制进ubuntu
 4.在OS-master文件夹位置创建Terminal
 5.
 ```
@@ -62,5 +62,15 @@ bochs -f bochsrc
 | 树状文件系统  | 黎力 |
 | 小游戏  | 黄伟杰 |
 | help && 命令跳转  | 马天放 |
+
+
+### 修改文件目录
+开机动画	/lib/ls.c  
+help &&跳转： /kernel/main.c 200行  
+树状文件系统： /kernel/main.c 500行  
+小游戏：	/game/TTT.c	/include/2048Game.h  
+进程： /kernel/main.c 0-150行	500行  
+进程间通信：TestA &TestB  
+
 
 ## Deadline：8.19
