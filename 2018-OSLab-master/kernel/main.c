@@ -239,6 +239,7 @@ void TestA()
 //  const int rd_bytes = 3;
 //  char bufr[rd_bytes];
     sl();
+    login();
     clear();
     printf("                        ==================================\n");
     printf("                                     Geniux v1.0.0         \n");
@@ -668,4 +669,40 @@ void GoDir(char* path, char* file)
         printf("%s is not a directory!\n", absoPath);
     else
         memcpy(path, absoPath, 512);
+}
+
+void login()
+{
+   char tty_name[] = "/dev_tty0";
+
+    char rdbuf[256];
+    char cmd[20];
+
+
+    int fd_stdin  = open(tty_name, O_RDWR);
+
+    char password[8]="lilinb";
+    
+    
+    while(1)
+    {
+        printf("Please enter your password: \n");
+        int r = read(fd_stdin, rdbuf, 512);
+        rdbuf[r] = 0;
+
+        // 解析命令
+        int pos = 0;
+        while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+        {
+            cmd[pos] = rdbuf[pos];
+            pos++;
+        }
+        cmd[pos] = 0;
+
+        if(strcmp(cmd, "lilinb") == 0)
+            break;
+        else
+            printf("Wrong Password! \n");
+    }
+    
 }
