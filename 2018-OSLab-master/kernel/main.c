@@ -299,6 +299,10 @@ void TestA()
         {
             ls(current_dirr);
         }
+        else if (strcmp(cmd, "calendar") == 0)
+        {
+            Calendar(filename1);
+        }
         else if (strcmp(cmd, "touch") == 0)  // 创建文件
         {
             CreateFile(current_dirr, filename1);
