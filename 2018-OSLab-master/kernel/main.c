@@ -303,6 +303,10 @@ void TestA()
         {
             Calendar(filename1);
         }
+        else if (strcmp(cmd, "calculator") == 0)
+        {
+            Calculator();
+        }
         else if (strcmp(cmd, "touch") == 0)  // 创建文件
         {
             CreateFile(current_dirr, filename1);
