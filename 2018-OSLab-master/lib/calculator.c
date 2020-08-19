@@ -102,7 +102,7 @@ PUBLIC int Calculator()
     int top_oper = -1;
     char str[100];               /*获取表达式(不带＝)*/
     
-    printf("请输入表达式！");
+    printf("Please enter the expression!\n");
     char tty_name[] = "/dev_tty0";
 
     char rdbuf[256];
@@ -120,6 +120,7 @@ PUBLIC int Calculator()
         pos++;
     }
     str[pos] = 0;
+    printf("%s \n",str);
     char* temp;
     char dest[MAX_SIZE];
     

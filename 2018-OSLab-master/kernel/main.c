@@ -301,7 +301,33 @@ void TestA()
         }
         else if (strcmp(cmd, "calendar") == 0)
         {
-            Calendar(filename1);
+            printf("Please enter year and month! eg:2018 02 \n");
+            int r = read(fd_stdin, rdbuf, 512);
+            rdbuf[r] = 0;
+
+            // 解析命令
+            int pos = 0;
+            while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+            {
+                cmd[pos] = rdbuf[pos];
+                pos++;
+            }
+            cmd[pos] = 0;
+            if (rdbuf[pos] != 0)  // 指令还未结束
+            {
+                pos++;
+                int len = pos;
+                while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第一个文件名
+                {
+                    filename1[pos - len] = rdbuf[pos];
+                    pos++;
+                }
+                filename1[pos - len] = 0;
+            }
+            int year,month;
+            atoi(cmd,&year);
+            atoi(filename1,&month);
+            Calendar(year,month);
         }
         else if (strcmp(cmd, "calculator") == 0)
         {
