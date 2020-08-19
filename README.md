@@ -40,15 +40,15 @@ ls(显示 floppy即可）
 ``` 
 sudo apt install libc6-dev-i386
 ```
-3.将github上的2018-OSLab-master复制进ubuntu
-4.在OS-master文件夹位置创建Terminal
+3.将github上的2018-OSLab-master复制进ubuntu  
+4.在OS-master文件夹位置创建Terminal  
 5.
 ```
 make image
 bochs -f bochsrc
 ```
 
-6.修改时，如果新建xxx.c文件，需要在makefile中加入相应文件名。
+6.修改时，如果新建xxx.c文件，需要在makefile中加入相应文件名。 
 7.入口文件在TestA()
 
 ---------
