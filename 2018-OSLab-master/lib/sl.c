@@ -334,8 +334,7 @@ printf("                                                                        
 printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 milli_delay(delay_time+15000);
 clear();
-
-    delay_time=3000;
+delay_time=1000;
 
 printf("                                                                            \n");
 printf("                                                                            \n");
@@ -843,6 +842,6 @@ printf("                                                                        
 printf("                                                                            \n");
 printf("                                                                            \n");
 printf(" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-milli_delay(delay_time+20000);
+milli_delay(delay_time);
 clear();
 }

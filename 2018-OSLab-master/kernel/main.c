@@ -223,6 +223,7 @@ PUBLIC void convert_to_absolute(char* dest, char* path, char* file)
 void TestA()
 {
     char tty_name[] = "/dev_tty0";
+    PUBLIC int timeset=0;
 
     char rdbuf[256];
     char cmd[20];
@@ -301,37 +302,81 @@ void TestA()
         }
         else if (strcmp(cmd, "calendar") == 0)
         {
-            printf("Please enter year and month! eg:2018 02 \n");
-            int r = read(fd_stdin, rdbuf, 512);
-            rdbuf[r] = 0;
-
-            // 解析命令
-            int pos = 0;
-            while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+            while(1)
             {
-                cmd[pos] = rdbuf[pos];
-                pos++;
-            }
-            cmd[pos] = 0;
-            if (rdbuf[pos] != 0)  // 指令还未结束
-            {
-                pos++;
-                int len = pos;
-                while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第一个文件名
-                {
-                    filename1[pos - len] = rdbuf[pos];
-                    pos++;
-                }
-                filename1[pos - len] = 0;
-            }
-            int year,month;
-            atoi(cmd,&year);
-            atoi(filename1,&month);
-            Calendar(year,month);
+            	printf("Please enter year and month! eg:2020 08 \n");
+            	int r = read(fd_stdin, rdbuf, 512);
+            	rdbuf[r] = 0;
+            	int pos = 0;
+            	while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  
+            	{
+                	cmd[pos] = rdbuf[pos];
+                	pos++;
+            	}
+            	cmd[pos] = 0;
+            	if (rdbuf[pos] != 0)  
+            	{
+            	    pos++;
+                	int len = pos;
+                	while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第一个文件名
+                	{
+                 	   filename1[pos - len] = rdbuf[pos];
+                    	pos++;
+                	}
+                	filename1[pos - len] = 0;
+                	int year,month;
+            		atoi(cmd,&year);
+            		atoi(filename1,&month);
+            		Calendar(year,month);
+            		break;
+            	}
+            	else
+            	{
+                	printf("wrong type of input! Please enter the correct month! eg:2020 08\n");
+		}
+	    }
+		    
         }
-        else if (strcmp(cmd, "calculator") == 0)
+        else if (strcmp(cmd, "time") == 0)
         {
-            Calculator();
+            if(timeset==0)
+            {
+            	printf("Please set current time! eg: 18:20:00 \n");
+            	int r = read(fd_stdin, rdbuf, 512);
+            	rdbuf[r] = 0;
+
+            	// 解析命令
+            	int pos = 0;
+            	while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+            	{
+                	cmd[pos] = rdbuf[pos];
+                	pos++;
+            	}
+            	cmd[pos] = 0;
+            	SetCurrentTime(cmd);
+            	timeset=1;
+            	       	
+            }
+            else
+            {
+            	printf("Enter 'gettime' to get current time; \nEnter a specific time point to change current time. eg:18:20:20 \n");
+            	int r = read(fd_stdin, rdbuf, 512);
+            	rdbuf[r] = 0;
+
+            	// 解析命令
+            	int pos = 0;
+            	while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+            	{
+                	cmd[pos] = rdbuf[pos];
+                	pos++;
+            	}
+            	cmd[pos] = 0;
+            	if(strcmp(cmd, "gettime") == 0)
+            	    GetCurrentTime();
+            	else
+            	    SetCurrentTime(cmd);
+            	
+            }
         }
         else if (strcmp(cmd, "touch") == 0)  // 创建文件
         {
@@ -475,6 +520,7 @@ void TestB()
 
 void TestC()
 {
+    TimeRunning();
     spin("TestC");
 }
 
@@ -740,3 +786,4 @@ void login()
     }
     
 }
+
