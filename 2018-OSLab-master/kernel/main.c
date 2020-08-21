@@ -17,6 +17,7 @@
 #include "global.h"
 #include "proto.h"
 #include "2048Game.h"
+#include "file.h"
 
 /*======================================================================*
                             kernel_main
@@ -241,11 +242,13 @@ void TestA()
     const char bufw[80] = {0};
 //  const int rd_bytes = 3;
 //  char bufr[rd_bytes];
+
     sl();
     login();
+
     clear();
     printf("                        ==================================\n");
-    printf("                                     Geniux v1.0.0         \n");
+    printf("                                     LiOS v1.0.0         \n");
     printf("                                 Kernel on Orange's \n\n");
     printf("                                     Welcome !\n");
     printf("                        ==================================\n");
@@ -285,7 +288,7 @@ void TestA()
 
 		if (process_running == TESTA)//当前进程为进程A
 		{
-			printf("[root@localhost: %s]", current_dirr);  // 打印当前路径
+			printf("[root@LiOS: %s]", current_dirr);  // 打印当前路径
 			int r = read(fd_stdin, rdbuf, 512);
 			rdbuf[r] = 0;
 
@@ -450,8 +453,58 @@ void TestA()
 			}
 			else if (strcmp(cmd, "processC") == 0)//切换到进程C
 			{
-			processC();
+				processC();
 			}
+			else if (strcmp(cmd, "ls") == 0)//显示当前文件夹下文件
+			{
+				ls(current_dirr);
+			}
+			else if (strcmp(cmd, "touch") == 0)//创建新文件
+			{
+				CreateFile(current_dirr, filename1);
+			}
+			else if (strcmp(cmd, "rm") == 0)  // 删除文件
+			{
+				DeleteFile(current_dirr, filename1);
+			}
+			else if (strcmp(cmd, "cat") == 0)  // 打印文件内容
+			{
+				ReadFile(current_dirr, filename1);
+			}
+			else if (strcmp(cmd, "vi") == 0)  // 写文件
+			{
+				WriteFile(current_dirr, filename1);
+			}
+			else if (strcmp(cmd, "mkdir") == 0)  // 创建目录
+			{
+				CreateDir(current_dirr, filename1);
+			}
+			else if (strcmp(cmd, "cd") == 0)//切换目录
+			{
+				GoDir(current_dirr, filename1);
+			}
+			else if (strcmp(cmd, "hide") == 0)//隐藏文件
+			{
+				HideFile(current_dirr, filename1, 0);
+			}
+			else if (strcmp(cmd, "show") == 0)//显示文件
+			{
+				HideFile(current_dirr, filename1, 1);
+			}
+			else if (strcmp(cmd, "help") == 0)//帮助
+			{
+				help();
+			}
+			else if (strcmp(cmd, "clear") == 0)//清屏
+			{
+				clear();
+				printf("                        ==================================\n");
+				printf("                                     LiOS v1.0.0         \n");
+				printf("                                 Kernel on Orange's \n\n");
+				printf("                                     Welcome !\n");
+				printf("                        ==================================\n");
+			}
+
 			else
 				printf("Command not found, please check!\n");
 			// printf("rdbuf:      %s\n", rdbuf);
@@ -737,7 +790,29 @@ void clear()
     clear_screen(0,console_table[current_console].cursor);
     console_table[current_console].crtc_start = 0;
     console_table[current_console].cursor = 0;
+}
 
+void help()
+{
+	printf("==========================LiOS help info====================================\n");
+	printf("Command List              :\n");
+	printf("1. help                   : Show this help message\n");
+	printf("2. process                : A process manage,show you all process-info here\n");
+	printf("3. clear                  : Clear the screen\n");
+	printf("4. ls                     : List all files in current directory\n");
+	printf("5. touch     [filename]   : Create a new file in current directory\n");
+	printf("6. rm        [filename]   : Delete a file in current directory\n");
+	printf("7. cat       [filename]   : Print the content of a file in current directory\n");
+	printf("8. vi        [filename]   : Write new content at the end of the file\n");
+	printf("9. mkdir     [dirname]    : Create a new directory in current directory\n");
+	printf("10. cd       [dirname]    : Go to a directory in current directory\n");
+	printf("11. hide     [filename]   : Hide a file \n");
+	printf("12. show     [filename]   : Unhide a file \n");
+	printf("13. game                  : Show the game list\n");
+	printf("14. time                  : Show the system current time\n");
+	printf("15. messageA/B/C          : Send message to the terminal A or B or C\n");
+	printf("16. processA/B/C          : Switch to the terminal A or B or C\n");
+	printf("==============================================================================\n");
 }
 
 void login()
@@ -747,11 +822,9 @@ void login()
     char rdbuf[256];
     char cmd[20];
 
-
     int fd_stdin  = open(tty_name, O_RDWR);
 
     char password[8]="lilinb";
-    
     
     while(1)
     {

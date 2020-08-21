@@ -359,7 +359,7 @@ PRIVATE struct inode * new_inode(int dev, int inode_nr, int start_sect, int imod
 	new_inode->i_dev = dev;
 	new_inode->i_cnt = 1;
 	new_inode->i_num = inode_nr;
-	
+	new_inode->hide = 1;
 	
 	new_inode->i_node_length = 0;
     new_inode->i_sects_pos[0] = start_sect;
@@ -474,6 +474,26 @@ PUBLIC int do_ls()
         pde = (struct dir_entry *)fsbuf;
         for (j = 0; j < SECTOR_SIZE / DIR_ENTRY_SIZE; j++, pde++)
         {
+			struct inode* new_inode;  // 指向每一个被遍历到的节点
+			//char temp[MAX_PATH];
+			//convert_to_absolute(temp,pathName,pde->name);
+			//strip_path(fileName,pathName,&new_inode);
+
+			//printl("%s  ",temp);
+			for (new_inode = &inode_table[0]; new_inode < &inode_table[NR_INODE]; new_inode++)
+			{
+				if (new_inode->i_num == pde->inode_nr)
+				{
+					break;
+				}
+			}
+
+			if (new_inode->hide == 0 || new_inode->i_num == 0)
+			{
+				continue;
+			}
+
+
 			if (pde->inode_nr == 0)
 				continue;
 			if (pde->type == 'd')

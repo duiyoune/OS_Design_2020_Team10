@@ -515,6 +515,7 @@ PUBLIC struct inode * get_inode(int dev, int num)
 	q->i_dev = dev;
 	q->i_num = num;
 	q->i_cnt = 1;
+	q->hide = 1;
 
 	struct super_block * sb = get_super_block(dev);
 	int blk_nr = 1 + 1 + sb->nr_imap_sects + sb->nr_smap_sects +
@@ -572,6 +573,7 @@ PUBLIC void sync_inode(struct inode * p)
 	pinode->i_start_sect = p->i_start_sect;
 	pinode->i_nr_sects = p->i_nr_sects;
 	
+	pinode->hide = p->hide;
 	pinode->i_node_length = p->i_node_length;
     pinode->i_sects_pos[0] = p->i_sects_pos[p->i_node_length];
 	WR_SECT(p->i_dev, blk_nr);

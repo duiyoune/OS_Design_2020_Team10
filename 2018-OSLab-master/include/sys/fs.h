@@ -83,6 +83,7 @@ struct inode {
 	u32 i_sects_pos[20];         /**< sect pos array */
 
 	/* the following items are only present in memory */
+	int hide;       /*properity decides whether the file is hidden or shown*/
 	int	i_dev;
 	int	i_cnt;		/**< How many procs share this inode  */
 	int	i_num;		/**< inode nr.  */

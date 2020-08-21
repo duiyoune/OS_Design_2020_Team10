@@ -29,7 +29,9 @@ OBJS		= kernel/kernel.o lib/syscall.o kernel/start.o kernel/main.o\
 			kernel/clock.o kernel/keyboard.o kernel/tty.o kernel/console.o\
 			kernel/i8259.o kernel/global.o kernel/protect.o kernel/proc.o\
 			kernel/systask.o kernel/hd.o\
+			kernel/file.o\
 			game/TTT.o \
+			game/MineSweeper.o\
 			lib/printf.o lib/sl.o lib/vsprintf.o\
 			lib/kliba.o lib/klib.o lib/string.o lib/ls.o lib/mkdir.o lib/misc.o\
 			lib/open.o lib/read.o lib/write.o lib/close.o lib/unlink.o\
@@ -116,6 +118,9 @@ kernel/protect.o: kernel/protect.c
 kernel/proc.o: kernel/proc.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+kernel/file.o: kernel/file.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 lib/printf.o: lib/printf.c
 	$(CC) $(CFLAGS) -o $@ $<
 
@@ -176,6 +181,8 @@ lib/sl.o: lib/sl.c
 game/TTT.o: game/TTT.c
 	$(CC) $(CFLAGS) -o $@ $<
 	
+game/MineSweeper.o: game/MineSweeper.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 lib/getpid.o: lib/getpid.c
 	$(CC) $(CFLAGS) -o $@ $<
