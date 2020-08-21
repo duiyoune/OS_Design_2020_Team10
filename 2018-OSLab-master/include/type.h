@@ -54,6 +54,7 @@ struct mess3 {
 typedef struct {
 	int source;
 	int type;
+	char text[128];
 	union {
 		struct mess1 m1;
 		struct mess2 m2;

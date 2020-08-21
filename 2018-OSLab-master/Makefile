@@ -33,7 +33,7 @@ OBJS		= kernel/kernel.o lib/syscall.o kernel/start.o kernel/main.o\
 			lib/printf.o lib/sl.o lib/vsprintf.o\
 			lib/kliba.o lib/klib.o lib/string.o lib/ls.o lib/mkdir.o lib/misc.o\
 			lib/open.o lib/read.o lib/write.o lib/close.o lib/unlink.o\
-			lib/getpid.o lib/syslog.o lib/calendar.o lib/currenttime.o\
+			lib/getpid.o lib/syslog.o lib/calendar.o lib/currenttime.o lib/process.o\
 			lib/fork.o lib/exit.o lib/sleep.o lib/wait.o\
 			mm/main.o mm/func.o\
 			fs/main.o fs/open.o fs/misc.o fs/read_write.o\
@@ -135,6 +135,9 @@ lib/calendar.o: lib/calendar.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 lib/currenttime.o: lib/currenttime.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+lib/process.o: lib/process.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 lib/misc.o: lib/misc.c

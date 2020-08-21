@@ -41,6 +41,7 @@ PUBLIC void Init_test();
 PUBLIC void TestA();
 PUBLIC void TestB();
 PUBLIC void TestC();
+PUBLIC void TestD();
 void nothing();
 PUBLIC void panic(const char *fmt, ...);
 
