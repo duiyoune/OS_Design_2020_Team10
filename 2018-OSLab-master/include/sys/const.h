@@ -108,6 +108,11 @@
 #define TASK_HD     2
 #define TASK_FS     3
 #define TASK_MM     4
+
+#define TESTA     5
+#define TESTB     6
+#define TESTC     7
+
 // #define INIT        5
 /* #define TASK_MM	4 */
 #define ANY		(NR_TASKS + NR_PROCS + 10)
@@ -143,6 +148,9 @@ enum msgtype {
 
 	/* SYS task */
 	GET_TICKS, GET_PID, FORK, EXEC, WAIT, SLEEP, EXIT,
+
+	MESSAGE_A, MESSAGE_B, MESSAGE_C,
+	PROCESS_A, PROCESS_B, PROCESS_C,
 
 	/* FS */
 	OPEN, CLOSE, READ, WRITE, LSEEK, STAT, UNLINK, LS, MKDIR,

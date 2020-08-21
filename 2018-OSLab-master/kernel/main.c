@@ -222,6 +222,8 @@ PUBLIC void convert_to_absolute(char* dest, char* path, char* file)
 //1号终端
 void TestA()
 {
+	MESSAGE msg;//消息
+
     char tty_name[] = "/dev_tty0";
     PUBLIC int timeset=0;
 
@@ -251,223 +253,212 @@ void TestA()
     char current_dirr[512] = "/";  // 记录当前路径（其实路径字符长度上限为MAX_PATH）
 
     while (1) {
-        printf("[root@localhost: %s]", current_dirr);  // 打印当前路径
-        int r = read(fd_stdin, rdbuf, 512);
-        rdbuf[r] = 0;
-
-        // 解析命令
-        int pos = 0;
-        while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
-        {
-            cmd[pos] = rdbuf[pos];
-            pos++;
-        }
-        cmd[pos] = 0;
-        if (rdbuf[pos] != 0)  // 指令还未结束
-        {
-            pos++;
-            int len = pos;
-            while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第一个文件名
-            {
-                filename1[pos - len] = rdbuf[pos];
-                pos++;
-            }
-            filename1[pos - len] = 0;
-        }
-        if (rdbuf[pos] != 0)  // 指令还未结束
-        {
-            pos++;
-            int len = pos;
-            while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第二个文件名
-            {
-                filename2[pos - len] = rdbuf[pos];
-                pos++;
-            }
-            filename2[pos - len] = 0;
-        }
-        // printf("%s O %s O %s O", cmd, filename1, filename2);
-        //show();
-        if (strcmp(cmd, "process") == 0)
-        {
-            ProcessManage();
-        }
-        else if (strcmp(cmd, "filemng") == 0)
-        {
-            printf("File Manager is already running on CONSOLE-1 ! \n");
-            continue;
-        }
-        else if (strcmp(cmd, "ls") == 0)
-        {
-            ls(current_dirr);
-        }
-        else if (strcmp(cmd, "calendar") == 0)
-        {
-            while(1)
-            {
-            	printf("Please enter year and month! eg:2020 08 \n");
-            	int r = read(fd_stdin, rdbuf, 512);
-            	rdbuf[r] = 0;
-            	int pos = 0;
-            	while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  
-            	{
-                	cmd[pos] = rdbuf[pos];
-                	pos++;
-            	}
-            	cmd[pos] = 0;
-            	if (rdbuf[pos] != 0)  
-            	{
-            	    pos++;
-                	int len = pos;
-                	while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第一个文件名
-                	{
-                 	   filename1[pos - len] = rdbuf[pos];
-                    	pos++;
-                	}
-                	filename1[pos - len] = 0;
-                	int year,month;
-            		atoi(cmd,&year);
-            		atoi(filename1,&month);
-            		Calendar(year,month);
-            		break;
-            	}
-            	else
-            	{
-                	printf("wrong type of input! Please enter the correct month! eg:2020 08\n");
+		if (process_running != TESTA)//当前进程不为进程A
+		{
+			//接受消息
+			send_recv(RECEIVE, ANY, &msg);
+			int src = msg.source;
+			//处理消息
+			switch (msg.type)
+			{
+			case MESSAGE_A://进程A接受到消息			
+				msg.RETVAL = TRUE;
+				char src_pro[20];//发送消息的进程
+				if (src == TESTB)//发送消息的进程为进程B
+				{
+					strcpy(src_pro, "processB");
+				}
+				if (src == TESTC)//发送消息的进程为进程C
+				{
+					strcpy(src_pro, "processC");
+				}
+				printf("processA received message from %s:%s\n", src_pro, msg.text);
+				send_recv(SEND, src, &msg);
+				break;
+			case PROCESS_A://切换到进程A
+				break;
+			default:
+				panic("unknown msg type");
+				break;
+			}
 		}
-	    }
-		    
-        }
-        else if (strcmp(cmd, "time") == 0)
-        {
-            if(timeset==0)
-            {
-            	printf("Please set current time! eg: 18:20:00 \n");
-            	int r = read(fd_stdin, rdbuf, 512);
-            	rdbuf[r] = 0;
 
-            	// 解析命令
-            	int pos = 0;
-            	while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
-            	{
-                	cmd[pos] = rdbuf[pos];
-                	pos++;
-            	}
-            	cmd[pos] = 0;
-            	SetCurrentTime(cmd);
-            	timeset=1;
-            	       	
-            }
-            else
-            {
-            	printf("Enter 'gettime' to get current time; \nEnter a specific time point to change current time. eg:18:20:20 \n");
-            	int r = read(fd_stdin, rdbuf, 512);
-            	rdbuf[r] = 0;
+		if (process_running == TESTA)//当前进程为进程A
+		{
+			printf("[root@localhost: %s]", current_dirr);  // 打印当前路径
+			int r = read(fd_stdin, rdbuf, 512);
+			rdbuf[r] = 0;
 
-            	// 解析命令
-            	int pos = 0;
-            	while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
-            	{
-                	cmd[pos] = rdbuf[pos];
-                	pos++;
-            	}
-            	cmd[pos] = 0;
-            	if(strcmp(cmd, "gettime") == 0)
-            	    GetCurrentTime();
-            	else
-            	    SetCurrentTime(cmd);
-            	
-            }
-        }
-        else if (strcmp(cmd, "touch") == 0)  // 创建文件
-        {
-            CreateFile(current_dirr, filename1);
-        }
-        else if (strcmp(cmd, "rm") == 0)  // 删除文件
-        {
-            DeleteFile(current_dirr, filename1);
-        }
-        else if (strcmp(cmd, "cat") == 0)  // 打印文件内容
-        {
-            ReadFile(current_dirr, filename1);
-        }
-        else if (strcmp(cmd, "vi") == 0)  // 写文件
-        {
-            WriteFile(current_dirr, filename1);
-        }
-        else if(strcmp(cmd, "mkdir") == 0)  // 创建目录
-        {
-            CreateDir(current_dirr, filename1);
-        }
-        else if(strcmp(cmd, "cd") == 0)
-        {
-            GoDir(current_dirr, filename1);
-        }
-        else if (strcmp(cmd, "help") == 0)
-        {
-            help();
-        }
-        else if (strcmp(cmd, "runttt") == 0)
-        {
-            TTT(fd_stdin, fd_stdout);
-        }
-        else if (strcmp(cmd, "run2048") == 0)
-        {
-            start2048Game(fd_stdin, fd_stdout);
-        }
-        else if (strcmp(cmd, "clear") == 0)
-        {
-            clear();
-            printf("                        ==================================\n");
-            printf("                                     Geniux v1.0.0         \n");
-            printf("                                 Kernel on Orange's \n\n");
-            printf("                                     Welcome !\n");
-            printf("                        ==================================\n");
-        }
+			// 解析命令
+			int pos = 0;
+			while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+			{
+				cmd[pos] = rdbuf[pos];
+				pos++;
+			}
+			cmd[pos] = 0;
+			if (rdbuf[pos] != 0)  // 指令还未结束
+			{
+				pos++;
+				int len = pos;
+				while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第一个文件名
+				{
+					filename1[pos - len] = rdbuf[pos];
+					pos++;
+				}
+				filename1[pos - len] = 0;
+			}
+			if (rdbuf[pos] != 0)  // 指令还未结束
+			{
+				pos++;
+				int len = pos;
+				while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第二个文件名
+				{
+					filename2[pos - len] = rdbuf[pos];
+					pos++;
+				}
+				filename2[pos - len] = 0;
+			}
+			// printf("%s O %s O %s O", cmd, filename1, filename2);
+			//show();
+			if (strcmp(cmd, "process") == 0)
+			{
+				ShowProcess();
+			}
+			else if (strcmp(cmd, "calendar") == 0)
+			{
+				while (1)
+				{
+					printf("Please enter year and month! eg:2020 08 \n");
+					int r = read(fd_stdin, rdbuf, 512);
+					rdbuf[r] = 0;
+					int pos = 0;
+					while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)
+					{
+						cmd[pos] = rdbuf[pos];
+						pos++;
+					}
+					cmd[pos] = 0;
+					if (rdbuf[pos] != 0)
+					{
+						pos++;
+						int len = pos;
+						while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取第一个文件名
+						{
+							filename1[pos - len] = rdbuf[pos];
+							pos++;
+						}
+						filename1[pos - len] = 0;
+						int year, month;
+						atoi(cmd, &year);
+						atoi(filename1, &month);
+						Calendar(year, month);
+						break;
+					}
+					else
+					{
+						printf("wrong type of input! Please enter the correct month! eg:2020 08\n");
+					}
+				}
 
-        else if (strcmp(cmd, "getpid") == 0) {
-            printf(asm_strcat(getpid(), "\n"));
-            printi(getpid());
-            printf("\n");
-            printi(new_getpid());
-            printf("\n");
-        }
+			}
+			else if (strcmp(cmd, "time") == 0)
+			{
+				if (timeset == 0)
+				{
+					printf("Please set current time! eg: 18:20:00 \n");
+					int r = read(fd_stdin, rdbuf, 512);
+					rdbuf[r] = 0;
 
-        else if (strcmp(cmd, "test_fork") == 0) {
-            int pid = fork();
-            if (pid == 0) {
-            } else {
-                printl("childpid: %d, childname: %s\n", pid, proc_table[pid].name);
-            }
-        }
+					// 解析命令
+					int pos = 0;
+					while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+					{
+						cmd[pos] = rdbuf[pos];
+						pos++;
+					}
+					cmd[pos] = 0;
+					SetCurrentTime(cmd);
+					timeset = 1;
 
-        else if (strcmp(cmd, "test_ldt") == 0) {
-            printl("{MM} base_high: %d, bsae_mid: %d, low: %d)\n", proc_table[0].ldts[INDEX_LDT_C].base_high, proc_table[0].ldts[INDEX_LDT_C].base_mid, proc_table[0].ldts[INDEX_LDT_C].base_low);
-            printl("{MM} base_high: %d, bsae_mid: %d, low: %d)\n", proc_table[1].ldts[INDEX_LDT_C].base_high, proc_table[1].ldts[INDEX_LDT_C].base_mid, proc_table[1].ldts[INDEX_LDT_C].base_low);
-            printl("{MM} base_high: %d, bsae_mid: %d, low: %d)\n", proc_table[2].ldts[INDEX_LDT_C].base_high, proc_table[2].ldts[INDEX_LDT_C].base_mid, proc_table[2].ldts[INDEX_LDT_C].base_low);
-            printl("{MM} base_high: %d, bsae_mid: %d, low: %d)\n", proc_table[3].ldts[INDEX_LDT_C].base_high, proc_table[3].ldts[INDEX_LDT_C].base_mid, proc_table[3].ldts[INDEX_LDT_C].base_low);
-            printl("{MM} base_high: %d, bsae_mid: %d, low: %d)\n", proc_table[4].ldts[INDEX_LDT_C].base_high, proc_table[4].ldts[INDEX_LDT_C].base_mid, proc_table[4].ldts[INDEX_LDT_C].base_low);
-            printl("{MM} base_high: %d, bsae_mid: %d, low: %d)\n", proc_table[5].ldts[INDEX_LDT_C].base_high, proc_table[5].ldts[INDEX_LDT_C].base_mid, proc_table[5].ldts[INDEX_LDT_C].base_low);
-            int k_base, k_limit;
-            get_kernel_map(&k_base, &k_limit);
-            printl("0x%x, 0x%x\n", k_base, k_limit);
-            // struct proc* p_proc= proc_table+5;
-            // printl("{MM} %d, %d, %d, %d)\n", p_proc->ldts[INDEX_LDT_C], p_proc->ldts[INDEX_LDT_RW], p_proc->ldts[INDEX_LDT_C].attr1, p_proc->ldts[INDEX_LDT_RW].attr1);
-            // struct descriptor* ppd = &(proc_table[5].ldts[INDEX_LDT_RW]);
-            // printl("{MM} %d,%d,%d,%d,%d,%d)\n", ppd->limit_low, ppd->base_low,  ppd->base_high, ppd->base_mid, ppd->attr1, ppd->limit_high_attr2, ppd->base_high);
-            int i;
-            for (i = 0; i < NR_TASKS + NR_NATIVE_PROCS ; ++i) {
-                struct descriptor* ppd = &(proc_table[i].ldts[INDEX_LDT_RW]);
-                printl("{MM} %s, %x,%x,%x,%x,%x,%x)\n", proc_table[i].name, ppd->limit_low, ppd->base_low,  ppd->base_mid, ppd->base_high, ppd->attr1, ppd->limit_high_attr2);
-                
-            }
-        }
+				}
+				else
+				{
+					printf("Enter 'gettime' to get current time; \nEnter a specific time point to change current time. eg:18:20:20 \n");
+					int r = read(fd_stdin, rdbuf, 512);
+					rdbuf[r] = 0;
 
-        else
-            printf("Command not found, please check!\n");
-        // printf("rdbuf:      %s\n", rdbuf);
-        // printf("cmd:        %s\n", cmd);
-        // printf("filename1:  %s\n", filename1);
-        // printf("filename2:  %s\n", filename2);
+					// 解析命令
+					int pos = 0;
+					while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+					{
+						cmd[pos] = rdbuf[pos];
+						pos++;
+					}
+					cmd[pos] = 0;
+					if (strcmp(cmd, "gettime") == 0)
+						GetCurrentTime();
+					else
+						SetCurrentTime(cmd);
+
+				}
+			}
+			
+			else if (strcmp(cmd, "messageB") == 0)//向进程B发送消息
+			{
+				printf("please input the message!\n");
+				//读取文本
+				char text_messageB[512];
+				int r_messageB = read(fd_stdin, rdbuf, 512);
+				rdbuf[r_messageB] = 0;
+				int pos_messageB = 0;
+				while (rdbuf[pos_messageB] != 0)
+				{
+					text_messageB[pos_messageB] = rdbuf[pos_messageB];
+					pos_messageB++;
+				}
+				text_messageB[pos_messageB] = 0;
+
+				if (messageB(text_messageB) == TRUE)//成功向进程B发送消息
+				{
+					printf("processA sent message to processB!\n");
+				}
+			}
+			else if (strcmp(cmd, "messageC") == 0)//向进程C发送消息
+			{
+				printf("please input the message!\n");
+				//读取文本
+				char text_messageC[512];
+				int r_messageC = read(fd_stdin, rdbuf, 512);
+				rdbuf[r_messageC] = 0;
+				int pos_messageC = 0;
+				while (rdbuf[pos_messageC] != 0)
+				{
+					text_messageC[pos_messageC] = rdbuf[pos_messageC];
+					pos_messageC++;
+				}
+				text_messageC[pos_messageC] = 0;
+
+				if (messageC(text_messageC) == TRUE)//成功向进程C发送消息
+				{
+					printf("processA sent message to processC!\n");
+				}
+			}
+			else if (strcmp(cmd, "processB") == 0)//切换到进程B
+			{
+				processB();
+			}
+			else if (strcmp(cmd, "processC") == 0)//切换到进程C
+			{
+			processC();
+			}
+			else
+				printf("Command not found, please check!\n");
+			// printf("rdbuf:      %s\n", rdbuf);
+			// printf("cmd:        %s\n", cmd);
+			// printf("filename1:  %s\n", filename1);
+			// printf("filename2:  %s\n", filename2);
+		}
     }
 
 }
@@ -478,52 +469,249 @@ void TestA()
 //二号终端
 void TestB()
 {
-    char tty_name[] = "/dev_tty1";
+	MESSAGE msg;//消息
 
-    int fd_stdin  = open(tty_name, O_RDWR);
-    assert(fd_stdin  == 0);
-    int fd_stdout = open(tty_name, O_RDWR);
-    assert(fd_stdout == 1);
+	//输入
+	char tty_name[] = "/dev_tty1";
+	char rdbuf[128];
+	char cmd[8];
+	char filename[120];
+	int fd_stdin = open(tty_name, O_RDWR);
+	assert(fd_stdin == 0);
+	int fd_stdout = open(tty_name, O_RDWR);
+	assert(fd_stdout == 1);
 
-    char rdbuf[128];
-    char cmd[8];
-    char filename[120];
-    char buf[1024];
-    int m,n;
-    printf("                        ==================================\n");
-    printf("                                    File Manager           \n");
-    printf("                                 Kernel on Orange's \n\n");
-    printf("                        ==================================\n");
-    while (1) {
-        printf("$ ");
-        int r = read(fd_stdin, rdbuf, 70);
-        rdbuf[r] = 0;
+	while (1)
+	{
+		if (process_running != TESTB)////当前进程不为进程B
+		{
+			//接受消息
+			send_recv(RECEIVE, ANY, &msg);
+			int src = msg.source;
+			//处理消息
+			switch (msg.type)
+			{
+			case MESSAGE_B://进程B接受到消息			
+				msg.RETVAL = TRUE;
+				char src_pro[20];//发送消息的进程
+				if (src == TESTA)//发送消息的进程为进程A
+				{
+					strcpy(src_pro, "processA");
+				}
+				if (src == TESTC)//发送消息的进程为进程C
+				{
+					strcpy(src_pro, "processC");
+				}
+				printf("processB received message from %s:%s\n", src_pro, msg.text);
+				send_recv(SEND, src, &msg);
+				break;
+			case PROCESS_B://切换到进程B
+				break;
+			default:
+				panic("unknown msg type");
+				break;
+			}
+		}
+		if (process_running == TESTB)////当前进程为进程B
+		{
+			printf("[processB]");
 
+			int r = read(fd_stdin, rdbuf, 512);
+			rdbuf[r] = 0;
+			// 解析命令
+			int pos = 0;
+			while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+			{
+				cmd[pos] = rdbuf[pos];
+				pos++;
+			}
+			cmd[pos] = 0;
 
+			if (strcmp(cmd, "help") == 0)
+			{
 
-        if (strcmp(rdbuf, "help") == 0)
-        {
-            printf("=============================================================================\n");
-            printf("Command List     :\n");
-            printf("6. help                    : Display the help message\n");
-            printf("==============================================================================\n");
-        }
-        else
-        {
-            printf("Command not found, Please check!\n");
-            continue;
-        }
-    }
-    assert(0); /* never arrive here */
+			}
+			else if (strcmp(cmd, "messageA") == 0)//向进程A发送消息
+			{
+				printf("please input the message!\n");
+				//读取文本
+				char text_messageA[512];
+				int r_messageA = read(fd_stdin, rdbuf, 512);
+				rdbuf[r_messageA] = 0;
+				int pos_messageA = 0;
+				while (rdbuf[pos_messageA] != 0)
+				{
+					text_messageA[pos_messageA] = rdbuf[pos_messageA];
+					pos_messageA++;
+				}
+				text_messageA[pos_messageA] = 0;
+
+				if (messageA(text_messageA) == TRUE)//成功向进程A发送消息
+				{
+					printf("processB sent message to processA!\n");
+				}
+			}
+			else if (strcmp(cmd, "messageC") == 0)//向进程C发送消息
+			{
+				printf("please input the message!\n");
+				//读取文本
+				char text_messageC[512];
+				int r_messageC = read(fd_stdin, rdbuf, 512);
+				rdbuf[r_messageC] = 0;
+				int pos_messageC = 0;
+				while (rdbuf[pos_messageC] != 0)
+				{
+					text_messageC[pos_messageC] = rdbuf[pos_messageC];
+					pos_messageC++;
+				}
+				text_messageC[pos_messageC] = 0;
+
+				if (messageC(text_messageC) == TRUE)//成功向进程C发送消息
+				{
+					printf("processB sent message to processC!\n");
+				}
+			}
+			else if (strcmp(cmd, "processA") == 0)//切换到进程A
+			{
+				processA();
+			}
+			else if (strcmp(cmd, "processC") == 0)//切换到进程C
+			{
+				processC();
+			}
+			else
+			{
+				printf("Command not found, please check!\n");
+			}
+		}
+	}
 }
-
 
 void TestC()
 {
-    TimeRunning();
-    spin("TestC");
+	MESSAGE msg;//消息
+
+	//输入
+	char tty_name[] = "/dev_tty2";
+	char rdbuf[128];
+	char cmd[8];
+	char filename[120];
+	int fd_stdin = open(tty_name, O_RDWR);
+	assert(fd_stdin == 0);
+	int fd_stdout = open(tty_name, O_RDWR);
+	assert(fd_stdout == 1);
+
+	while (1)
+	{
+		if (process_running != TESTC)////当前进程不为进程C
+		{
+			//接受消息
+			send_recv(RECEIVE, ANY, &msg);
+			int src = msg.source;
+			//处理消息
+			switch (msg.type)
+			{
+			case MESSAGE_C://进程C接受到消息			
+				msg.RETVAL = TRUE;
+				char src_pro[20];//发送消息的进程
+				if (src == TESTA)//发送消息的进程为进程A
+				{
+					strcpy(src_pro, "processA");
+				}
+				if (src == TESTB)//发送消息的进程为进程B
+				{
+					strcpy(src_pro, "processB");
+				}
+				printf("processC received message from %s:%s\n", src_pro, msg.text);
+				send_recv(SEND, src, &msg);
+				break;
+			case PROCESS_C://切换到进程C
+				break;
+			default:
+				panic("unknown msg type");
+				break;
+			}
+		}
+		if (process_running == TESTC)////当前进程为进程C
+		{
+			printf("[processC]");
+
+			int r = read(fd_stdin, rdbuf, 512);
+			rdbuf[r] = 0;
+			// 解析命令
+			int pos = 0;
+			while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+			{
+				cmd[pos] = rdbuf[pos];
+				pos++;
+			}
+			cmd[pos] = 0;
+
+			if (strcmp(cmd, "help") == 0)
+			{
+
+			}
+			else if (strcmp(cmd, "messageA") == 0)//向进程A发送消息
+			{
+				printf("please input the message!\n");
+				//读取文本
+				char text_messageA[512];
+				int r_messageA = read(fd_stdin, rdbuf, 512);
+				rdbuf[r_messageA] = 0;
+				int pos_messageA = 0;
+				while (rdbuf[pos_messageA] != 0)
+				{
+					text_messageA[pos_messageA] = rdbuf[pos_messageA];
+					pos_messageA++;
+				}
+				text_messageA[pos_messageA] = 0;
+
+				if (messageA(text_messageA) == TRUE)//成功向进程A发送消息
+				{
+					printf("processC sent message to processA!\n");
+				}
+			}
+			else if (strcmp(cmd, "messageB") == 0)//向进程B发送消息
+			{
+				printf("please input the message!\n");
+				//读取文本
+				char text_messageB[512];
+				int r_messageB = read(fd_stdin, rdbuf, 512);
+				rdbuf[r_messageB] = 0;
+				int pos_messageB = 0;
+				while (rdbuf[pos_messageB] != 0)
+				{
+					text_messageB[pos_messageB] = rdbuf[pos_messageB];
+					pos_messageB++;
+				}
+				text_messageB[pos_messageB] = 0;
+
+				if (messageB(text_messageB) == TRUE)//成功向进程B发送消息
+				{
+					printf("processC sent message to processB!\n");
+				}
+			}
+			else if (strcmp(cmd, "processA") == 0)//切换到进程A
+			{
+				processA();
+			}
+			else if (strcmp(cmd, "processB") == 0)//切换到进程B
+			{
+				processB();
+			}
+			else
+			{
+				printf("Command not found, please check!\n");
+			}
+		}
+	}
 }
 
+void TestD()
+{
+	TimeRunning();
+	spin("TestD");
+}
 
 /*****************************************************************************
  *                                panic
@@ -550,205 +738,6 @@ void clear()
     console_table[current_console].crtc_start = 0;
     console_table[current_console].cursor = 0;
 
-}
-
-//void show()
-//{
-//  printf("%d  %d  %d  %d",console_table[current_console].con_size, console_table[current_console].crtc_start, console_table[current_console].cursor, console_table[current_console].orig);
-//}
-
-void help()
-{
-    printf("==========================Geniux help info====================================\n");
-    printf("Command List              :\n");
-    printf("1. process                : A process manage,show you all process-info here\n");
-    printf("2. filemng                : Run the file manager\n");
-    printf("3. clear                  : Clear the screen\n");
-    printf("4. help                   : Show this help message\n");
-    printf("5. ls                     : List all files in current directory\n");
-    printf("6. touch     [filename]   : Create a new file in current directory\n");
-    printf("7. rm        [filename]   : Delete a file in current directory\n");
-    printf("8. cat       [filename]   : Print the content of a file in current directory\n");
-    printf("9. vi        [filename]   : Write new content at the end of the file\n");
-    printf("10. mkdir    [dirname]    : Create a new directory in current directory\n");
-    printf("11. cd       [dirname]    : Go to a directory in current directory\n");
-    printf("12. runttt                : Run a small game on this OS\n");
-    printf("13. run2048               : Run 2048 game on this OS\n");
-    printf("==============================================================================\n");
-}
-
-void ProcessManage()
-{
-    int i;
-    printf("=============================================================================\n");
-    printf("      PID      |    name       | spriority    | running?\n");
-    //进程号，进程名，优先级，是否是系统进程，是否在运行
-    printf("-----------------------------------------------------------------------------\n");
-    for ( i = 0 ; i < NR_TASKS + NR_PROCS ; ++i )//逐个遍历
-    {
-        /*if ( proc_table[i].priority == 0) continue;//系统资源跳过*/
-        if(proc_table[i].p_flags!=FREE_SLOT)
-            printf("        %d           %s            %d                %s\n", proc_table[i].pid, proc_table[i].name, proc_table[i].priority, proc_table[i].p_flags==FREE_SLOT? "NO":"YES");
-    }
-    printf("=============================================================================\n");
-}
-
-void CreateFile(char* path, char* file)
-{
-    char absoPath[512];
-    convert_to_absolute(absoPath, path, file);
-
-    int fd = open(absoPath, O_CREAT | O_RDWR);
-
-    if (fd == -1)
-    {
-        printf("Failed to create a new file with name %s\n", file);
-        return;
-    }
-
-    char buf[1] = {0};
-    write(fd, buf, 1);
-    printf("File created: %s (fd %d)\n", file, fd);
-    close(fd);
-}
-
-void DeleteFile(char* path, char* file)
-{
-    char absoPath[512];
-    convert_to_absolute(absoPath, path, file);
-    int m=unlink(absoPath);
-    if (m == 0)
-        printf("%s deleted!\n", file);
-    else
-        printf("Failed to delete %s!\n", file);
-}
-
-void ReadFile(char* path, char* file)
-{
-    char absoPath[512];
-    convert_to_absolute(absoPath, path, file);
-    int fd = open(absoPath, O_RDWR);
-    if (fd == -1)
-    {
-        printf("Failed to open %s!\n", file);
-        return;
-    }
-
-    char buf[4096];
-    int n = read(fd, buf, 4096);
-    if (n == -1)  // 读取文件内容失败
-    {
-        printf("An error has occured in reading the file!\n");
-        close(fd);
-        return;
-    }
-
-    printf("%s\n", buf);
-    close(fd);
-}
-
-void WriteFile(char* path, char* file)
-{
-    char absoPath[512];
-    convert_to_absolute(absoPath, path, file);
-    int fd = open(absoPath, O_RDWR);
-    if (fd == -1)
-    {
-        printf("Failed to open %s!\n", file);
-        return;
-    }
-
-    char tty_name[] = "/dev_tty0";
-    int fd_stdin  = open(tty_name, O_RDWR);
-    if (fd_stdin == -1)
-    {
-        printf("An error has occured in writing the file!\n");
-        return;
-    }
-    char writeBuf[4096];  // 写缓冲区
-    int endPos = read(fd_stdin, writeBuf, 4096);
-    writeBuf[endPos] = 0;
-    write(fd, writeBuf, endPos + 1);  // 结束符也应写入
-    close(fd);
-}
-
-void CreateDir(char* path, char* file)
-{
-    char absoPath[512];
-    convert_to_absolute(absoPath, path, file);
-    int fd = open(absoPath, O_RDWR);
-
-    if (fd != -1)
-    {
-        printf("Failed to create a new directory with name %s\n", file);
-        return;
-    }
-    mkdir(absoPath);
-}
-
-void GoDir(char* path, char* file)
-{
-    int flag = 0;  // 判断是进入下一级目录还是返回上一级目录
-    char newPath[512] = {0};
-    if (file[0] == '.' && file[1] == '.')  // cd ..返回上一级目录
-    {
-        flag = 1;
-        int pos_path = 0;
-        int pos_new = 0;
-        int i = 0;
-        char temp[128] = {0};  // 用于存放某一级目录的名称
-        while (path[pos_path] != 0)
-        {
-            if (path[pos_path] == '/')
-            {
-                pos_path++;
-                if (path[pos_path] == 0)  // 已到达结尾
-                    break;
-                else
-                {
-                    temp[i] = '/';
-                    temp[i + 1] = 0;
-                    i = 0;
-                    while (temp[i] != 0)
-                    {
-                        newPath[pos_new] = temp[i];
-                        temp[i] = 0;  // 抹掉
-                        pos_new++;
-                        i++;
-                    }
-                    i = 0;
-                }
-            }
-            else
-            {
-                temp[i] = path[pos_path];
-                i++;
-                pos_path++;
-            }
-        }
-    }
-    char absoPath[512];
-    char temp[512];
-    int pos = 0;
-    while (file[pos] != 0)
-    {
-        temp[pos] = file[pos];
-        pos++;
-    }
-    temp[pos] = '/';
-    temp[pos + 1] = 0;
-    if (flag == 1)  // 返回上一级目录
-    {
-        temp[0] = 0;
-        convert_to_absolute(absoPath, newPath, temp);
-    }
-    else  // 进入下一级目录
-        convert_to_absolute(absoPath, path, temp);
-    int fd = open(absoPath, O_RDWR);
-    if (fd == -1)
-        printf("%s is not a directory!\n", absoPath);
-    else
-        memcpy(path, absoPath, 512);
 }
 
 void login()

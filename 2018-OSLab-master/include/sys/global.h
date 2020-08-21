@@ -11,6 +11,8 @@
 #define	EXTERN
 #endif
 
+EXTERN int process_running;//当前位于的进程
+
 EXTERN	int	ticks;
 
 EXTERN	int	disp_pos;
