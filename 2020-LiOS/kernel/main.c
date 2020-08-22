@@ -17,6 +17,7 @@
 #include "global.h"
 #include "proto.h"
 #include "file.h"
+#include "2048Game.h"
 
 /*======================================================================*
 							kernel_main
@@ -498,9 +499,15 @@ void TestA()
 				clear();
 				welcome();
 			}
-			else if (strcmp(cmd, "game3") == 0)//game 2
+			else if (strcmp(cmd, "game3") == 0)//game 3
 			{
 				tetris(fd_stdin, fd_stdout);
+				clear();
+				welcome();
+			}
+			else if (strcmp(cmd, "game4") == 0)//game 4
+			{
+				start2048Game(fd_stdin, fd_stdout);
 				clear();
 				welcome();
 			}
@@ -847,6 +854,7 @@ void game()
 	printf("1. game1                  : MineSweeper game\n");
 	printf("2. game2                  : Box pushing game\n");
 	printf("3. game3                  :    Tetris   game\n");
+	printf("4. game4                  :     2048    game\n");
 	printf("==============================================================================\n");
 }
 
