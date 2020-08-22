@@ -16,7 +16,6 @@
 #include "console.h"
 #include "global.h"
 #include "proto.h"
-#include "2048Game.h"
 #include "file.h"
 
 /*======================================================================*
@@ -247,11 +246,7 @@ void TestA()
     login();
 
     clear();
-    printf("                        ==================================\n");
-    printf("                                     LiOS v1.0.0         \n");
-    printf("                                 Kernel on Orange's \n\n");
-    printf("                                     Welcome !\n");
-    printf("                        ==================================\n");
+    welcome();
 
     char current_dirr[512] = "/";  // 记录当前路径（其实路径字符长度上限为MAX_PATH）
 
@@ -491,6 +486,18 @@ void TestA()
 			{
 				HideFile(current_dirr, filename1, 1);
 			}
+			else if (strcmp(cmd, "game1") == 0)//帮助
+			{
+				MineSweeper(fd_stdin,fd_stdout);
+				clear();
+				welcome();
+			}
+			else if (strcmp(cmd, "game2") == 0)//帮助
+			{
+				boxPushing(fd_stdin,fd_stdout);
+				clear();
+				welcome();
+			}
 			else if (strcmp(cmd, "help") == 0)//帮助
 			{
 				help();
@@ -498,11 +505,7 @@ void TestA()
 			else if (strcmp(cmd, "clear") == 0)//清屏
 			{
 				clear();
-				printf("                        ==================================\n");
-				printf("                                     LiOS v1.0.0         \n");
-				printf("                                 Kernel on Orange's \n\n");
-				printf("                                     Welcome !\n");
-				printf("                        ==================================\n");
+				welcome();
 			}
 
 			else
@@ -790,6 +793,15 @@ void clear()
     clear_screen(0,console_table[current_console].cursor);
     console_table[current_console].crtc_start = 0;
     console_table[current_console].cursor = 0;
+}
+
+void welcome()
+{
+				printf("                        ==================================\n");
+				printf("                                     LiOS v1.0.0         \n");
+				printf("                                 Kernel on Orange's \n\n");
+				printf("                                     Welcome !\n");
+				printf("                        ==================================\n");
 }
 
 void help()

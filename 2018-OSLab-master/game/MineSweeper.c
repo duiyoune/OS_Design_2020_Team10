@@ -17,7 +17,7 @@
 
 void initgame(char mine[ROW][COL], char show[ROW][COL], int x, int y);
 void display(char arr[ROW][COL], int x, int y);
-int  play(char mine[ROW][COL], char show[ROW][COL], int x, int y,int fd_stdin);
+int  play(char mine[ROW][COL], char show[ROW][COL], int x, int y, int fd_stdin);
 int checkmine(char mine[ROW][COL], char show[ROW][COL], int i, int j);
 void aroundmines(char mine[ROW][COL], char show[ROW][COL], int i, int j);
 
@@ -45,7 +45,7 @@ void game(int fd_stdin)//开始游戏
 	display(show, ROW, COL);
 	while (1)
 	{
-		ret = play(mine, show, ROW, COL,fd_stdin);
+		ret = play(mine, show, ROW, COL, fd_stdin);
 		if ('w' == ret)
 		{
 			display(mine, ROW, COL);
@@ -65,24 +65,24 @@ void game(int fd_stdin)//开始游戏
 	}
 }
 
-PUBLIC int MineSweeper(int fd_stdin,int fd_stdout)        
+PUBLIC int MineSweeper(int fd_stdin, int fd_stdout)
 {
-	
+
 	int input = 0;
 	do
 	{
 		meun();
 		printf("Please select >: ");
-		char buf[10]={0};
-		read(fd_stdin,buf,2);
-		char input=buf[0];
+		char buf[10] = { 0 };
+		read(fd_stdin, buf, 2);
+		char input = buf[0];
 		switch (input)
 		{
 		case '1':
-			game(fd_stdin); 
+			game(fd_stdin);
 			break;
 		case '0':
-			printf("Exit...\n"); 
+			printf("Exit...\n");
 			break;
 		default:
 			printf("Error select! \n");
@@ -167,7 +167,7 @@ void display(char arr[ROW][COL], int x, int y)//打印游戏界面
 		printf("|");
 		for (j = 1; j < y - 1; j++)
 		{
-			printf(" %C  |", arr[i][j]);
+			printf(" %c |", arr[i][j]);
 		}
 		printf("\n");
 		printf("   ");
@@ -180,7 +180,7 @@ void display(char arr[ROW][COL], int x, int y)//打印游戏界面
 	}
 }
 
-int play(char mine[ROW][COL], char show[ROW][COL], int x, int y,int fd_stdin)//玩家玩
+int play(char mine[ROW][COL], char show[ROW][COL], int x, int y, int fd_stdin)//玩家玩
 {
 	int i = 0;//坐标变量
 	int j = 0;
@@ -192,15 +192,16 @@ int play(char mine[ROW][COL], char show[ROW][COL], int x, int y,int fd_stdin)//�
 	int count = 0;//统计是否排完雷的变量
 	while (1)
 	{
-		char szCmd[80]={0};
+		char szCmd[80] = { 0 };
 		printf("Please Input The Line Position where you search (x): ");
-    		n = read(fd_stdin,szCmd,80);
-    		szCmd[1] = 0;
-    		atoi(szCmd,&i);
-    		printf("Please Input The Column Position where you search (y): ");
-    		n = read(fd_stdin,szCmd,80);
-    		szCmd[1] = 0;
-    		atoi(szCmd,&j);
+		n = read(fd_stdin, szCmd, 80);
+		szCmd[1] = 0;
+		atoi(szCmd, &i);
+		printf("Please Input The Column Position where you search (y): ");
+		n = read(fd_stdin, szCmd, 80);
+		szCmd[1] = 0;
+		atoi(szCmd, &j);
+
 		if (i >= 1 && i < x - 1 && j >= 1 && j < y - 1)//位置合法性检测
 		{
 			if ('*' != mine[i][j])//判断是否为雷------------非雷

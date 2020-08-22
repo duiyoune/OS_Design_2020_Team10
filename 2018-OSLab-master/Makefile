@@ -30,7 +30,7 @@ OBJS		= kernel/kernel.o lib/syscall.o kernel/start.o kernel/main.o\
 			kernel/i8259.o kernel/global.o kernel/protect.o kernel/proc.o\
 			kernel/systask.o kernel/hd.o\
 			kernel/file.o\
-			game/TTT.o \
+			game/boxPushing.o \
 			game/MineSweeper.o\
 			lib/printf.o lib/sl.o lib/vsprintf.o\
 			lib/kliba.o lib/klib.o lib/string.o lib/ls.o lib/mkdir.o lib/misc.o\
@@ -178,7 +178,7 @@ lib/mkdir.o: lib/mkdir.c
 lib/sl.o: lib/sl.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-game/TTT.o: game/TTT.c
+game/boxPushing.o: game/boxPushing.c
 	$(CC) $(CFLAGS) -o $@ $<
 	
 game/MineSweeper.o: game/MineSweeper.c
