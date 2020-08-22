@@ -824,6 +824,17 @@ void help()
 	printf("14. time                  : Show the system current time\n");
 	printf("15. messageA/B/C          : Send message to the terminal A or B or C\n");
 	printf("16. processA/B/C          : Switch to the terminal A or B or C\n");
+	printf("17. calender              : A calender application\n");
+	printf("18. time                  : Set the system time\n");
+	printf("==============================================================================\n");
+}
+
+void game()
+{
+	printf("==========================LiOS game info====================================\n");
+	printf("Command List              :\n");
+	printf("1. game1                  : MineSweeper game\n");
+	printf("1. game2                  : Box pushing game\n");
 	printf("==============================================================================\n");
 }
 
