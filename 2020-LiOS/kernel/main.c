@@ -890,7 +890,7 @@ void login()
 		else
 		{
 			printf("Wrong Password! \n");
-			milli_time(delay_time);
+			milli_delay(delay_time);
 			delay_time *= 5;
 		}
 	}
