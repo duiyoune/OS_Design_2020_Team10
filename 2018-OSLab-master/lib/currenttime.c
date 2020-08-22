@@ -16,10 +16,12 @@ int time_minute=0;
 int time_second=0;
 char time[10]="";
 
-PUBLIC void GetCurrentTime()
+PUBLIC int GetCurrentTime()
 {
     printf("Current Time:\n");
     printf("%d:%d:%d\n",time_hour,time_minute,time_second);
+    
+    return time_second;
 }
 
 PUBLIC void SetCurrentTime(char *CurrentTime)

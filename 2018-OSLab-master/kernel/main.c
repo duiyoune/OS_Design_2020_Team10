@@ -244,7 +244,8 @@ void TestA()
 
     sl();
     login();
-
+    SetCurrentTime("00:00:00");
+    timeset = 1;
     clear();
     welcome();
 
@@ -486,13 +487,13 @@ void TestA()
 			{
 				HideFile(current_dirr, filename1, 1);
 			}
-			else if (strcmp(cmd, "game1") == 0)//帮助
+			else if (strcmp(cmd, "game1") == 0)//game 1
 			{
 				MineSweeper(fd_stdin,fd_stdout);
 				clear();
 				welcome();
 			}
-			else if (strcmp(cmd, "game2") == 0)//帮助
+			else if (strcmp(cmd, "game2") == 0)//game 2
 			{
 				boxPushing(fd_stdin,fd_stdout);
 				clear();
@@ -501,6 +502,11 @@ void TestA()
 			else if (strcmp(cmd, "help") == 0)//帮助
 			{
 				help();
+			}
+			else if (strcmp(cmd, "game") == 0)//game list
+			{
+				clear();
+				game();
 			}
 			else if (strcmp(cmd, "clear") == 0)//清屏
 			{
@@ -834,7 +840,7 @@ void game()
 	printf("==========================LiOS game info====================================\n");
 	printf("Command List              :\n");
 	printf("1. game1                  : MineSweeper game\n");
-	printf("1. game2                  : Box pushing game\n");
+	printf("2. game2                  : Box pushing game\n");
 	printf("==============================================================================\n");
 }
 

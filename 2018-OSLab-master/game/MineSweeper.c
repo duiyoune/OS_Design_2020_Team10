@@ -9,10 +9,11 @@
 #include "console.h"
 #include "global.h"
 #include "proto.h"
+#include "rand.h"
 
 #define ROW 8+2  //雷区大小
 #define COL 8+2
-#define MINES 8  //雷的数量
+#define MINES 15  //雷的数量
 #define DEBUG 0  //测试开关
 
 void initgame(char mine[ROW][COL], char show[ROW][COL], int x, int y);
@@ -31,12 +32,12 @@ void meun()//打印菜单
 	printf("---------------------------\n");
 }
 
-void game(int fd_stdin)//开始游戏
+void startGame(int fd_stdin)//开始游戏
 {
 	char mine[ROW][COL];
 	char show[ROW][COL];
 	char ret = 0;
-
+	srand(GetCurrentTime());
 	initgame(mine, show, ROW, COL);
 
 #if DEBUG
@@ -79,7 +80,7 @@ PUBLIC int MineSweeper(int fd_stdin, int fd_stdout)
 		switch (input)
 		{
 		case '1':
-			game(fd_stdin);
+			startGame(fd_stdin);
 			break;
 		case '0':
 			printf("Exit...\n");
@@ -101,7 +102,7 @@ void initgame(char mine[ROW][COL], char show[ROW][COL], int x, int y)// 初始�
 	int k = 0;
 	memset(mine, ' ', x * y * sizeof(char));
 	memset(show, ' ', x * y * sizeof(char));
-	/*for (k = 0; k < MINES; k++)
+	for (k = 0; k < MINES; k++)
 	{
 		while (1)
 		{
@@ -113,9 +114,9 @@ void initgame(char mine[ROW][COL], char show[ROW][COL], int x, int y)// 初始�
 				break;
 			}
 		}
-	}*/
-	mine[2][3] = '*'; mine[3][3] = '*'; mine[6][6] = '*'; mine[7][5] = '*';
-	mine[8][4] = '*'; mine[8][2] = '*'; mine[7][1] = '*'; mine[6][1] = '*';
+	}
+	//mine[2][3] = '*'; mine[3][3] = '*'; mine[6][6] = '*'; mine[7][5] = '*';
+	//mine[8][4] = '*'; mine[8][2] = '*'; mine[7][1] = '*'; mine[6][1] = '*';
 }
 
 int checkmine(char mine[ROW][COL], char show[ROW][COL], int i, int j)//遍历周围雷的个数
