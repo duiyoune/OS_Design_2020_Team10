@@ -1,3 +1,6 @@
+#ifndef __2048_GAME_H__
+#define __2048_GAME_H__
+
 #include "stdio.h"
 #include "rand.h"
 
@@ -206,9 +209,9 @@ void addrandom2048(void) {
     
     // The random seed
     // srand2048(int(time(0)));
-    srand2048(1234);
+    srand(1234);
     
-    int index = rand2048() % zeroNum2048();
+    int index = rand() % zeroNum2048();
     int position = 0;
     for (int i = 0; i <= 3; i++) {
         for (int j = 0; j <= 3; j++) {
@@ -297,3 +300,5 @@ void initData(void) {
     validity2048 = 0;
     option2048[2] = "";
 }
+
+#endif
