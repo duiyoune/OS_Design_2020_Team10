@@ -1,8 +1,8 @@
 
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                            main.c
+							main.c
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-                                                    Forrest Yu, 2005
+													Forrest Yu, 2005
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 #include "type.h"
@@ -19,162 +19,162 @@
 #include "file.h"
 
 /*======================================================================*
-                            kernel_main
+							kernel_main
  *======================================================================*/
 PUBLIC int kernel_main()
 {
-    disp_str("-----\"kernel_main\" begins-----\n");
+	disp_str("-----\"kernel_main\" begins-----\n");
 
-    struct task* p_task;
-    struct proc* p_proc= proc_table;
-    char* p_task_stack = task_stack + STACK_SIZE_TOTAL;
-    // u16   selector_ldt = SELECTOR_LDT_FIRST;
-    u8    privilege;
-    u8    rpl;
-    int   eflags;
-    int   i, j;
-    int   prio;
-    for (i = 0; i < NR_TASKS+NR_PROCS; i++)
-    {
-        if (i >= NR_TASKS + NR_NATIVE_PROCS) {
-            p_proc->p_flags = FREE_SLOT;
-            p_proc++;
-            p_task++;
-            continue;
-        }
-        if (i < NR_TASKS)
-        {     /* 任务 */
-            p_task    = task_table + i;
-            privilege = PRIVILEGE_TASK;
-            rpl       = RPL_TASK;
-            eflags    = 0x1202; /* IF=1, IOPL=1, bit 2 is always 1   1 0010 0000 0010(2)*/
-            prio      = 15;     //设定优先级为15
-        }
-        else
-        {                  /* 用户进程 */
-            p_task    = user_proc_table + (i - NR_TASKS);
-            privilege = PRIVILEGE_USER;
-            rpl       = RPL_USER;
-            eflags    = 0x202; /* IF=1, bit 2 is always 1              0010 0000 0010(2)*/
-            prio      = 5;     //设定优先级为5
-        }
+	struct task* p_task;
+	struct proc* p_proc = proc_table;
+	char* p_task_stack = task_stack + STACK_SIZE_TOTAL;
+	// u16   selector_ldt = SELECTOR_LDT_FIRST;
+	u8    privilege;
+	u8    rpl;
+	int   eflags;
+	int   i, j;
+	int   prio;
+	for (i = 0; i < NR_TASKS + NR_PROCS; i++)
+	{
+		if (i >= NR_TASKS + NR_NATIVE_PROCS) {
+			p_proc->p_flags = FREE_SLOT;
+			p_proc++;
+			p_task++;
+			continue;
+		}
+		if (i < NR_TASKS)
+		{     /* 任务 */
+			p_task = task_table + i;
+			privilege = PRIVILEGE_TASK;
+			rpl = RPL_TASK;
+			eflags = 0x1202; /* IF=1, IOPL=1, bit 2 is always 1   1 0010 0000 0010(2)*/
+			prio = 15;     //设定优先级为15
+		}
+		else
+		{                  /* 用户进程 */
+			p_task = user_proc_table + (i - NR_TASKS);
+			privilege = PRIVILEGE_USER;
+			rpl = RPL_USER;
+			eflags = 0x202; /* IF=1, bit 2 is always 1              0010 0000 0010(2)*/
+			prio = 5;     //设定优先级为5
+		}
 
-        strcpy(p_proc->name, p_task->name); /* 设定进程名称 */
-        p_proc->p_parent = NO_TASK;
+		strcpy(p_proc->name, p_task->name); /* 设定进程名称 */
+		p_proc->p_parent = NO_TASK;
 
-        if (strcmp(p_task->name, "Init") != 0) {
-            p_proc->ldts[INDEX_LDT_C]  = gdt[SELECTOR_KERNEL_CS >> 3];
-            p_proc->ldts[INDEX_LDT_RW] = gdt[SELECTOR_KERNEL_DS >> 3];
+		if (strcmp(p_task->name, "Init") != 0) {
+			p_proc->ldts[INDEX_LDT_C] = gdt[SELECTOR_KERNEL_CS >> 3];
+			p_proc->ldts[INDEX_LDT_RW] = gdt[SELECTOR_KERNEL_DS >> 3];
 
-            /* change the DPLs */
-            p_proc->ldts[INDEX_LDT_C].attr1  = DA_C   | privilege << 5;
-            p_proc->ldts[INDEX_LDT_RW].attr1 = DA_DRW | privilege << 5;
-        }
-        else {      /* INIT process */
-            unsigned int k_base;
-            unsigned int k_limit;
-            int ret = get_kernel_map(&k_base, &k_limit);
-            assert(ret == 0);
-            init_descriptor(&p_proc->ldts[INDEX_LDT_C],
-                  0, /* bytes before the entry point
-                      * are useless (wasted) for the
-                      * INIT process, doesn't matter
-                      */
-                  (k_base + k_limit) >> LIMIT_4K_SHIFT,
-                  DA_32 | DA_LIMIT_4K | DA_C | privilege << 5);
+			/* change the DPLs */
+			p_proc->ldts[INDEX_LDT_C].attr1 = DA_C | privilege << 5;
+			p_proc->ldts[INDEX_LDT_RW].attr1 = DA_DRW | privilege << 5;
+		}
+		else {      /* INIT process */
+			unsigned int k_base;
+			unsigned int k_limit;
+			int ret = get_kernel_map(&k_base, &k_limit);
+			assert(ret == 0);
+			init_descriptor(&p_proc->ldts[INDEX_LDT_C],
+				0, /* bytes before the entry point
+					* are useless (wasted) for the
+					* INIT process, doesn't matter
+					*/
+				(k_base + k_limit) >> LIMIT_4K_SHIFT,
+				DA_32 | DA_LIMIT_4K | DA_C | privilege << 5);
 
-            init_descriptor(&p_proc->ldts[INDEX_LDT_RW],
-                  0, /* bytes before the entry point
-                      * are useless (wasted) for the
-                      * INIT process, doesn't matter
-                      */
-                  (k_base + k_limit) >> LIMIT_4K_SHIFT,
-                  DA_32 | DA_LIMIT_4K | DA_DRW | privilege << 5);
-        }
+			init_descriptor(&p_proc->ldts[INDEX_LDT_RW],
+				0, /* bytes before the entry point
+					* are useless (wasted) for the
+					* INIT process, doesn't matter
+					*/
+				(k_base + k_limit) >> LIMIT_4K_SHIFT,
+				DA_32 | DA_LIMIT_4K | DA_DRW | privilege << 5);
+		}
 
-        p_proc->regs.cs = INDEX_LDT_C << 3 | SA_TIL | rpl;
-        p_proc->regs.ds =
-            p_proc->regs.es =
-            p_proc->regs.fs =
-            p_proc->regs.ss = INDEX_LDT_RW << 3 | SA_TIL | rpl;
-        p_proc->regs.gs = (SELECTOR_KERNEL_GS & SA_RPL_MASK) | rpl;
+		p_proc->regs.cs = INDEX_LDT_C << 3 | SA_TIL | rpl;
+		p_proc->regs.ds =
+			p_proc->regs.es =
+			p_proc->regs.fs =
+			p_proc->regs.ss = INDEX_LDT_RW << 3 | SA_TIL | rpl;
+		p_proc->regs.gs = (SELECTOR_KERNEL_GS & SA_RPL_MASK) | rpl;
 
-        p_proc->regs.eip = (u32)p_task->initial_eip;
-        p_proc->regs.esp = (u32)p_task_stack;
-        p_proc->regs.eflags = eflags;
+		p_proc->regs.eip = (u32)p_task->initial_eip;
+		p_proc->regs.esp = (u32)p_task_stack;
+		p_proc->regs.eflags = eflags;
 
-        /* p_proc->nr_tty       = 0; */
+		/* p_proc->nr_tty       = 0; */
 
-        p_proc->p_flags = 0;
-        p_proc->p_msg = 0;
-        p_proc->p_recvfrom = NO_TASK;
-        p_proc->p_sendto = NO_TASK;
-        p_proc->has_int_msg = 0;
-        p_proc->q_sending = 0;
-        p_proc->next_sending = 0;
-        p_proc->pid = i;
+		p_proc->p_flags = 0;
+		p_proc->p_msg = 0;
+		p_proc->p_recvfrom = NO_TASK;
+		p_proc->p_sendto = NO_TASK;
+		p_proc->has_int_msg = 0;
+		p_proc->q_sending = 0;
+		p_proc->next_sending = 0;
+		p_proc->pid = i;
 
-        for (j = 0; j < NR_FILES; j++)
-            p_proc->filp[j] = 0;
+		for (j = 0; j < NR_FILES; j++)
+			p_proc->filp[j] = 0;
 
-        p_proc->ticks = p_proc->priority = prio;
+		p_proc->ticks = p_proc->priority = prio;
 
-        p_task_stack -= p_task->stacksize;
-        p_proc++;
-        p_task++;
-        // selector_ldt += 1 << 3;
-    }
+		p_task_stack -= p_task->stacksize;
+		p_proc++;
+		p_task++;
+		// selector_ldt += 1 << 3;
+	}
 
-        /* proc_table[NR_TASKS + 0].nr_tty = 0; */
-        /* proc_table[NR_TASKS + 1].nr_tty = 1; */
-        /* proc_table[NR_TASKS + 2].nr_tty = 1; */
+	/* proc_table[NR_TASKS + 0].nr_tty = 0; */
+	/* proc_table[NR_TASKS + 1].nr_tty = 1; */
+	/* proc_table[NR_TASKS + 2].nr_tty = 1; */
 
-    k_reenter = 0;
-    ticks = 0;
+	k_reenter = 0;
+	ticks = 0;
 
-    p_proc_ready = proc_table;
+	p_proc_ready = proc_table;
 
-    init_clock();
-        init_keyboard();
+	init_clock();
+	init_keyboard();
 
-    restart();
+	restart();
 
-    while(1){}
+	while (1) {}
 }
 
 
-void nothing(){
+void nothing() {
 }
 
 
 void Init_test()
 {
-    char tty_name[] = "/dev_tty2";
+	char tty_name[] = "/dev_tty2";
 
-    char rdbuf[128];
+	char rdbuf[128];
 
 
-    int fd_stdin  = open(tty_name, O_RDWR);
-    assert(fd_stdin  == 0);
-    int fd_stdout = open(tty_name, O_RDWR);
-    assert(fd_stdout == 1);
+	int fd_stdin = open(tty_name, O_RDWR);
+	assert(fd_stdin == 0);
+	int fd_stdout = open(tty_name, O_RDWR);
+	assert(fd_stdout == 1);
 
-    printf("Init() is running ...\n");
+	printf("Init() is running ...\n");
 
-    while(1) {
-        int r = read(fd_stdin, rdbuf, 70);
-        rdbuf[r] = 0;
-        printf("Before fork()");
-        int pid = fork();
-        if (pid != 0) { /* parent process */
-            printf("parent is running, child pid:%d\n", pid);
-            spin("parent");
-        }
-        else {  /* child process */
-            printf("child is running, pid:%d\n", getpid());
-            spin("child");
-        }
-    }
+	while (1) {
+		int r = read(fd_stdin, rdbuf, 70);
+		rdbuf[r] = 0;
+		printf("Before fork()");
+		int pid = fork();
+		if (pid != 0) { /* parent process */
+			printf("parent is running, child pid:%d\n", pid);
+			spin("parent");
+		}
+		else {  /* child process */
+			printf("child is running, pid:%d\n", getpid());
+			spin("child");
+		}
+	}
 }
 
 
@@ -183,11 +183,11 @@ void Init_test()
  *****************************************************************************/
 PUBLIC int get_ticks()
 {
-    MESSAGE msg;
-    reset_msg(&msg);
-    msg.type = GET_TICKS;
-    send_recv(BOTH, TASK_SYS, &msg);
-    return msg.RETVAL;
+	MESSAGE msg;
+	reset_msg(&msg);
+	msg.type = GET_TICKS;
+	send_recv(BOTH, TASK_SYS, &msg);
+	return msg.RETVAL;
 }
 
 
@@ -197,60 +197,60 @@ PUBLIC int get_ticks()
  *****************************************************************************/
 PUBLIC void convert_to_absolute(char* dest, char* path, char* file)
 {
-    int i=0, j=0;
-    while (path[i] != 0)  // 写入路径
-    {
-        dest[j] = path[i];
-        j++;
-        i++;
-    }
-    i = 0;
-    while (file[i] != 0)  // 写入文件名
-    {
-        dest[j] = file[i];
-        j++;
-        i++;
-    }
-    dest[j] = 0;  // 结束符
+	int i = 0, j = 0;
+	while (path[i] != 0)  // 写入路径
+	{
+		dest[j] = path[i];
+		j++;
+		i++;
+	}
+	i = 0;
+	while (file[i] != 0)  // 写入文件名
+	{
+		dest[j] = file[i];
+		j++;
+		i++;
+	}
+	dest[j] = 0;  // 结束符
 }
 
 
 /*======================================================================*
-                               TestA
+							   TestA
  *======================================================================*/
 
-//1号终端
+ //1号终端
 void TestA()
 {
 	MESSAGE msg;//消息
 
-    char tty_name[] = "/dev_tty0";
-    PUBLIC int timeset=0;
+	char tty_name[] = "/dev_tty0";
+	PUBLIC int timeset = 0;
 
-    char rdbuf[256];
-    char cmd[20];
-    char filename1[128];
-    char filename2[128];
+	char rdbuf[256];
+	char cmd[20];
+	char filename1[128];
+	char filename2[128];
 
-    int fd_stdin  = open(tty_name, O_RDWR);
-    assert(fd_stdin  == 0);
-    int fd_stdout = open(tty_name, O_RDWR);
-    assert(fd_stdout == 1);
+	int fd_stdin = open(tty_name, O_RDWR);
+	assert(fd_stdin == 0);
+	int fd_stdout = open(tty_name, O_RDWR);
+	assert(fd_stdout == 1);
 
-//  char filename[MAX_FILENAME_LEN+1] = "zsp01";
-    const char bufw[80] = {0};
-//  const int rd_bytes = 3;
-//  char bufr[rd_bytes];
+	//  char filename[MAX_FILENAME_LEN+1] = "zsp01";
+	const char bufw[80] = { 0 };
+	//  const int rd_bytes = 3;
+	//  char bufr[rd_bytes];
 
-    sl();
-    login();
-    SetCurrentTime("00:00:00");
-    clear();
-    welcome();
+	sl();
+	login();
+	SetCurrentTime("00:00:00");
+	clear();
+	welcome();
 
-    char current_dirr[512] = "/";  // 记录当前路径（其实路径字符长度上限为MAX_PATH）
+	char current_dirr[512] = "/";  // 记录当前路径（其实路径字符长度上限为MAX_PATH）
 
-    while (1) {
+	while (1) {
 		if (process_running != TESTA)//当前进程不为进程A
 		{
 			//接受消息
@@ -401,7 +401,7 @@ void TestA()
 
 				}
 			}
-			
+
 			else if (strcmp(cmd, "messageB") == 0)//向进程B发送消息
 			{
 				printf("please input the message!\n");
@@ -488,13 +488,19 @@ void TestA()
 			}
 			else if (strcmp(cmd, "game1") == 0)//game 1
 			{
-				MineSweeper(fd_stdin,fd_stdout);
+				MineSweeper(fd_stdin, fd_stdout);
 				clear();
 				welcome();
 			}
 			else if (strcmp(cmd, "game2") == 0)//game 2
 			{
-				boxPushing(fd_stdin,fd_stdout);
+				boxPushing(fd_stdin, fd_stdout);
+				clear();
+				welcome();
+			}
+			else if (strcmp(cmd, "game3") == 0)//game 2
+			{
+				tetris(fd_stdin, fd_stdout);
 				clear();
 				welcome();
 			}
@@ -520,14 +526,14 @@ void TestA()
 			// printf("filename1:  %s\n", filename1);
 			// printf("filename2:  %s\n", filename2);
 		}
-    }
+	}
 
 }
 
 /*======================================================================*
-                               TestB
+							   TestB
  *======================================================================*/
-//二号终端
+ //二号终端
 void TestB()
 {
 	MESSAGE msg;//消息
@@ -777,36 +783,36 @@ void TestD()
 /*****************************************************************************
  *                                panic
  *****************************************************************************/
-PUBLIC void panic(const char *fmt, ...)
+PUBLIC void panic(const char* fmt, ...)
 {
-    int i;
-    char buf[256];
+	int i;
+	char buf[256];
 
-    /* 4 is the size of fmt in the stack */
-    va_list arg = (va_list)((char*)&fmt + 4);
+	/* 4 is the size of fmt in the stack */
+	va_list arg = (va_list)((char*)&fmt + 4);
 
-    i = vsprintf(buf, fmt, arg);
+	i = vsprintf(buf, fmt, arg);
 
-    printl("%c !!panic!! %s", MAG_CH_PANIC, buf);
+	printl("%c !!panic!! %s", MAG_CH_PANIC, buf);
 
-    /* should never arrive here */
-    __asm__ __volatile__("ud2");
+	/* should never arrive here */
+	__asm__ __volatile__("ud2");
 }
 
 void clear()
 {
-    clear_screen(0,console_table[current_console].cursor);
-    console_table[current_console].crtc_start = 0;
-    console_table[current_console].cursor = 0;
+	clear_screen(0, console_table[current_console].cursor);
+	console_table[current_console].crtc_start = 0;
+	console_table[current_console].cursor = 0;
 }
 
 void welcome()
 {
-				printf("                        ==================================\n");
-				printf("                                     LiOS v1.0.0         \n");
-				printf("                                 Kernel on Orange's \n\n");
-				printf("                                     Welcome !\n");
-				printf("                        ==================================\n");
+	printf("                        ==================================\n");
+	printf("                                     LiOS v1.0.0         \n");
+	printf("                                 Kernel on Orange's \n\n");
+	printf("                                     Welcome !\n");
+	printf("                        ==================================\n");
 }
 
 void help()
@@ -840,45 +846,46 @@ void game()
 	printf("Command List              :\n");
 	printf("1. game1                  : MineSweeper game\n");
 	printf("2. game2                  : Box pushing game\n");
+	printf("3. game3                  :    Tetris   game\n");
 	printf("==============================================================================\n");
 }
 
 void login()
 {
-   char tty_name[] = "/dev_tty0";
+	char tty_name[] = "/dev_tty0";
 
-    char rdbuf[256];
-    char cmd[20];
+	char rdbuf[256];
+	char cmd[20];
 
-    int fd_stdin  = open(tty_name, O_RDWR);
+	int fd_stdin = open(tty_name, O_RDWR);
 
-    char password[8]="lilinb";
-    
-    while(1)
-    {
-    	int delay_time=10000;
-        printf("Please enter your password: \n");
-        int r = read(fd_stdin, rdbuf, 512);
-        rdbuf[r] = 0;
+	char password[8] = "lilinb";
 
-        // 解析命令
-        int pos = 0;
-        while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
-        {
-            cmd[pos] = rdbuf[pos];
-            pos++;
-        }
-        cmd[pos] = 0;
+	while (1)
+	{
+		int delay_time = 10000;
+		printf("Please enter your password: \n");
+		int r = read(fd_stdin, rdbuf, 512);
+		rdbuf[r] = 0;
 
-        if(strcmp(cmd, "lilinb") == 0)
-            break;
-        else
-        {
-            printf("Wrong Password! \n");
-            milli_time(delay_time);
-            delay_time*=5;
-        }
-    }
-    
+		// 解析命令
+		int pos = 0;
+		while (rdbuf[pos] != ' ' && rdbuf[pos] != 0)  // 读取指令
+		{
+			cmd[pos] = rdbuf[pos];
+			pos++;
+		}
+		cmd[pos] = 0;
+
+		if (strcmp(cmd, "lilinb") == 0)
+			break;
+		else
+		{
+			printf("Wrong Password! \n");
+			milli_time(delay_time);
+			delay_time *= 5;
+		}
+	}
+
 }
 
