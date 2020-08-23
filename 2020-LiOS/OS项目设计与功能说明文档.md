@@ -338,7 +338,13 @@ b.使用Bochs开源模拟器
 
 ◆ 描述
 
-◆ 实现方法![71598112297_.pic_hd](/Users/chenzijie/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/4f2c236d0700a2f5e162cfd9314cdae6/Message/MessageTemp/6c8303bc1f93e69fbd0870a23c53cfc1/Image/71598112297_.pic_hd.jpg)
+用户输入“messageA/B/C”向进程A/B/C发送消息，接下来输入想要发送的消息，发送成功则会在两边进程进行提示。（按下alt+f1/f2/f3可切换到进程A/B/C对应的终端）
+
+◆ 实现方法
+
+通过调用messageA/B/C()API，利用send_recv函数，将输入的文本作为消息的一个参数，进行进程间的消息发送与接收来达成进程间通信。
+
+![71598112297_.pic_hd](/Users/chenzijie/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/4f2c236d0700a2f5e162cfd9314cdae6/Message/MessageTemp/6c8303bc1f93e69fbd0870a23c53cfc1/Image/71598112297_.pic_hd.jpg)
 
 ###### ![81598112297_.pic_hd](/Users/chenzijie/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/4f2c236d0700a2f5e162cfd9314cdae6/Message/MessageTemp/6c8303bc1f93e69fbd0870a23c53cfc1/Image/81598112297_.pic_hd.jpg)
 
@@ -348,9 +354,11 @@ b.使用Bochs开源模拟器
 
 ◆ 描述
 
+用户输入“processA/B/C”切换到进程A/B/C。（按下alt+f1/f2/f3可切换到进程A/B/C对应的终端）用户可在切换后的进程进行后续操作，比如向进程A/B/C发送消息。
+
 ◆ 实现方法
 
-
+通过调用processA/B/C()API，利用进程接收消息的阻塞状态，通过进程间通信更改process_running变量确保当前只有一个进程在运行，其他两个进程处于接收消息的阻塞状态，来实现进程的切换。
 
 
 
