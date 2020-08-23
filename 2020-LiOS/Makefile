@@ -32,7 +32,7 @@ OBJS		= kernel/kernel.o lib/syscall.o kernel/start.o kernel/main.o\
 			kernel/file.o\
 			game/boxPushing.o \
 			game/MineSweeper.o\
-			game/Tetris.o\
+			game/TTT.o\
 			lib/printf.o lib/sl.o lib/vsprintf.o\
 			lib/kliba.o lib/klib.o lib/string.o lib/ls.o lib/mkdir.o lib/misc.o\
 			lib/open.o lib/read.o lib/write.o lib/close.o lib/unlink.o\
@@ -185,7 +185,7 @@ game/boxPushing.o: game/boxPushing.c
 game/MineSweeper.o: game/MineSweeper.c
 	$(CC) $(CFLAGS) -o $@ $<
 
-game/Tetris.o: game/Tetris.c
+game/TTT.o: game/TTT.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 lib/getpid.o: lib/getpid.c

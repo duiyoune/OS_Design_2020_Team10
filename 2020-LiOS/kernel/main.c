@@ -501,7 +501,7 @@ void TestA()
 			}
 			else if (strcmp(cmd, "game3") == 0)//game 3
 			{
-				tetris(fd_stdin, fd_stdout);
+				TTT(int fd_stdin, int fd_stdout)
 				clear();
 				welcome();
 			}
@@ -853,7 +853,7 @@ void game()
 	printf("Command List              :\n");
 	printf("1. game1                  : MineSweeper game\n");
 	printf("2. game2                  : Box pushing game\n");
-	printf("3. game3                  :    Tetris   game\n");
+	printf("3. game3                  : Tic-Tac-Toe game\n");
 	printf("4. game4                  :     2048    game\n");
 	printf("==============================================================================\n");
 }
