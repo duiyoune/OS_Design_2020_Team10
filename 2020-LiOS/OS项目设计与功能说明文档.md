@@ -292,11 +292,11 @@ b.使用Bochs开源模拟器
 
 ◆ 描述
 
-用户输入“runttt”指令，进入九宫棋游戏界面；首先系统打印空白棋盘（QP），然后用户通过输入棋子行、列位置来与系统下棋，直至出现死局或赢家；用户中途可以输入回车直接退出游戏界面，返回初始欢迎界面。
+用户输入“game3”指令，进入井字棋游戏界面；首先系统打印空白棋盘（chessboard），然后用户通过输入棋子行、列位置来与系统下棋，直至出现平局或赢家；用户中途可以输入回车直接退出游戏界面，返回初始欢迎界面。
 
 ◆ 实现方法
 
-调用TTT()方法，其中调用多个九宫棋相关函数（如UserInput(), AutoDone()等），实现九宫棋游戏的相应操作。
+调用TTT()方法，其中调用多个九宫棋相关函数，获取用户的键盘输入，共同实现井字棋游戏的游戏操作。
 
 ---
 
@@ -304,11 +304,11 @@ b.使用Bochs开源模拟器
 
 ◆ 描述
 
-用户输入“run2048”指令，进入2048游戏界面；系统自动打印游戏控制方法（wsad控制上下左右，enter键退出游戏）以及初始棋盘、当前分数（初始为0）；用户每次只能输入一个运动方向，系统自动刷新棋盘及分数，同时在棋盘内随机生成新数字格。
+用户输入“game4”指令，进入2048游戏界面；系统自动打印游戏方法、游戏界面以及当前分数；用户每次只能输入一个运动方向，系统自动刷新棋盘及分数，同时在棋盘内随机生成新的数字。
 
 ◆ 实现方法 
 
-调用start2048Game()方法，其中调用多个2048相关函数（如morge2048(), printNums2048, addRandom2048()等），共同实现2048游戏的操作。
+调用start2048Game()方法，其中调用多个2048相关函数，获取用户的键盘输入，共同实现2048的游戏操作。
 
 ![1941598166316_.pic_hd](/Users/chenzijie/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/4f2c236d0700a2f5e162cfd9314cdae6/Message/MessageTemp/f8ca4cfb42adeadb7cd3110b36121a79/Image/1941598166316_.pic_hd.jpg)
 
@@ -338,7 +338,13 @@ b.使用Bochs开源模拟器
 
 ◆ 描述
 
-◆ 实现方法![71598112297_.pic_hd](/Users/chenzijie/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/4f2c236d0700a2f5e162cfd9314cdae6/Message/MessageTemp/6c8303bc1f93e69fbd0870a23c53cfc1/Image/71598112297_.pic_hd.jpg)
+用户输入“messageA/B/C”向进程A/B/C发送消息，接下来输入想要发送的消息，发送成功则会在两边进程进行提示。（按下alt+f1/f2/f3可切换到进程A/B/C对应的终端）
+
+◆ 实现方法
+
+通过调用messageA/B/C()API，利用send_recv函数，将输入的文本作为消息的一个参数，进行进程间的消息发送与接收来达成进程间通信。
+
+![71598112297_.pic_hd](/Users/chenzijie/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/4f2c236d0700a2f5e162cfd9314cdae6/Message/MessageTemp/6c8303bc1f93e69fbd0870a23c53cfc1/Image/71598112297_.pic_hd.jpg)
 
 ###### ![81598112297_.pic_hd](/Users/chenzijie/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/com.tencent.xinWeChat/2.0b4.0.9/4f2c236d0700a2f5e162cfd9314cdae6/Message/MessageTemp/6c8303bc1f93e69fbd0870a23c53cfc1/Image/81598112297_.pic_hd.jpg)
 
@@ -348,7 +354,11 @@ b.使用Bochs开源模拟器
 
 ◆ 描述
 
+用户输入“processA/B/C”切换到进程A/B/C。（按下alt+f1/f2/f3可切换到进程A/B/C对应的终端）用户可在切换后的进程进行后续操作，比如向进程A/B/C发送消息。
+
 ◆ 实现方法
+
+通过调用processA/B/C()API，利用进程接收消息的阻塞状态，通过进程间通信更改process_running变量确保当前只有一个进程在运行，其他两个进程处于接收消息的阻塞状态，来实现进程的切换。
 
 
 
