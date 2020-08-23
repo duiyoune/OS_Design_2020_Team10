@@ -43,13 +43,15 @@ PUBLIC void start2048Game(int fd_stdin, int fd_stdout) {
         
         clear();
         printf("Welcome to 2048 Game!!!\n\n\n");
-        printf("Controls:\n");
-        printf("             LEFT: a    RIGHT: d\n");
-        printf("             UP:   w    DOWN:  s\n");
-        printf("             EXIT: press enter  \n\n\n");
+        printf("Help:\n");
+        printf("             LEFT:    a \n");
+        printf("             RIGHT:   d\n");
+        printf("             UP:      w\n");
+        printf("             DOWN:    s\n");
+        printf("             EXIT:  enter\n\n\n");
         // Check if the player is dead
         if (!isAlive2048()) {
-            printf("You lose!!!\a\n");
+            printf("Opps! GAME OVER!\a\n");
             break;
         }
 
