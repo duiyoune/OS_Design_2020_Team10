@@ -842,7 +842,7 @@ void help()
 	printf("14. time                  : Show the system current time\n");
 	printf("15. messageA/B/C          : Send message to the terminal A or B or C\n");
 	printf("16. processA/B/C          : Switch to the terminal A or B or C\n");
-	printf("17. calender              : A calender application\n");
+	printf("17. calendar              : A calendar application\n");
 	printf("18. time                  : Set the system time\n");
 	printf("==============================================================================\n");
 }
@@ -890,7 +890,7 @@ void login()
 		else
 		{
 			printf("Wrong Password! \n");
-			milli_time(delay_time);
+			milli_delay(delay_time);
 			delay_time *= 5;
 		}
 	}
