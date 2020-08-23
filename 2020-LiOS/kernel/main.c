@@ -501,7 +501,7 @@ void TestA()
 			}
 			else if (strcmp(cmd, "game3") == 0)//game 3
 			{
-				TTT(int fd_stdin, int fd_stdout)
+				TTT(fd_stdin, fd_stdout)
 				clear();
 				welcome();
 			}
