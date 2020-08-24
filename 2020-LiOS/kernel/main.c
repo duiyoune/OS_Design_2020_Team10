@@ -839,7 +839,6 @@ void help()
 	printf("11. hide     [filename]   : Hide a file \n");
 	printf("12. show     [filename]   : Unhide a file \n");
 	printf("13. game                  : Show the game list\n");
-	printf("14. time                  : Show the system current time\n");
 	printf("15. messageA/B/C          : Send message to the terminal A or B or C\n");
 	printf("16. processA/B/C          : Switch to the terminal A or B or C\n");
 	printf("17. calendar              : A calendar application\n");
@@ -868,10 +867,11 @@ void login()
 	int fd_stdin = open(tty_name, O_RDWR);
 
 	char password[8] = "lilinb";
+    int delay_time = 10000;
 
 	while (1)
 	{
-		int delay_time = 10000;
+
 		printf("Please enter your password: \n");
 		int r = read(fd_stdin, rdbuf, 512);
 		rdbuf[r] = 0;
