@@ -23,6 +23,7 @@
 #include "global.h"
 #include "keyboard.h"
 #include "proto.h"
+#include "file.h"
 
 #define ISDIR -66378
 
@@ -171,6 +172,8 @@ PRIVATE struct inode * create_file(char * path, int flags)
 	else
 		new_dir_entry(dir_inode, newino->i_num, filename,'f');
 
+	InitBlock(newino->i_num);
+	
 	return newino;
 }
 
@@ -185,10 +188,12 @@ PRIVATE struct inode * create_file(char * path, int flags)
 PUBLIC int do_close()
 {
 	int fd = fs_msg.FD;
+
+	DeleteBlock(pcaller->filp[fd]->fd_inode);
+
 	put_inode(pcaller->filp[fd]->fd_inode);
 	pcaller->filp[fd]->fd_inode = 0;
 	pcaller->filp[fd] = 0;
-
 	return 0;
 }
 
@@ -474,28 +479,12 @@ PUBLIC int do_ls()
         pde = (struct dir_entry *)fsbuf;
         for (j = 0; j < SECTOR_SIZE / DIR_ENTRY_SIZE; j++, pde++)
         {
-			struct inode* new_inode;  // 指向每一个被遍历到的节点
-			//char temp[MAX_PATH];
-			//convert_to_absolute(temp,pathName,pde->name);
-			//strip_path(fileName,pathName,&new_inode);
-
-			//printl("%s  ",temp);
-			for (new_inode = &inode_table[0]; new_inode < &inode_table[NR_INODE]; new_inode++)
-			{
-				if (new_inode->i_num == pde->inode_nr)
-				{
-					break;
-				}
-			}
-
-			if (new_inode->hide == 0 || new_inode->i_num == 0)
-			{
-				continue;
-			}
-
-
 			if (pde->inode_nr == 0)
 				continue;
+
+			if (blocks[pde->inode_nr].hide == 1)
+				continue;
+			
 			if (pde->type == 'd')
             	printl("  %2d     [dir]    %s\n", pde->inode_nr , pde->name);
 			else
@@ -535,6 +524,7 @@ PUBLIC int do_mkdir()
     pathName[name_len] = 0;
 
 	struct inode* dir_inode = create_file(pathName, ISDIR);
+
 	if (dir_inode)
 	{
 		printl("creating directory %s succeeded!\n", pathName);

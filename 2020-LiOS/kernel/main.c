@@ -251,6 +251,9 @@ void TestA()
 
 	char current_dirr[512] = "/";  // 记录当前路径（其实路径字符长度上限为MAX_PATH）
 
+	//int fd = open("ss", O_CREAT | O_RDWR);
+	int len = ReadDisk();
+
 	while (1) {
 		if (process_running != TESTA)//当前进程不为进程A
 		{
@@ -465,11 +468,11 @@ void TestA()
 			}
 			else if (strcmp(cmd, "cat") == 0)  // 打印文件内容
 			{
-				ReadFile(current_dirr, filename1);
+				ReadFile(current_dirr, filename1,fd_stdin);
 			}
 			else if (strcmp(cmd, "vi") == 0)  // 写文件
 			{
-				WriteFile(current_dirr, filename1);
+				WriteFile(current_dirr, filename1, fd_stdin);
 			}
 			else if (strcmp(cmd, "mkdir") == 0)  // 创建目录
 			{
@@ -524,6 +527,14 @@ void TestA()
 			{
 				clear();
 				welcome();
+			}
+			else if (strcmp(cmd, "lock") == 0)//给文件上锁
+			{
+			LockFile(current_dirr, filename1, fd_stdin);
+			}
+			else if (strcmp(cmd, "unlock") == 0)//给文件解锁
+			{
+			UnlockFile(current_dirr, filename1, fd_stdin);
 			}
 
 			else
@@ -838,12 +849,13 @@ void help()
 	printf("10. cd       [dirname]    : Go to a directory in current directory\n");
 	printf("11. hide     [filename]   : Hide a file \n");
 	printf("12. show     [filename]   : Unhide a file \n");
-	printf("13. game                  : Show the game list\n");
-	printf("14. time                  : Show the system current time\n");
-	printf("15. messageA/B/C          : Send message to the terminal A or B or C\n");
-	printf("16. processA/B/C          : Switch to the terminal A or B or C\n");
-	printf("17. calendar              : A calendar application\n");
-	printf("18. time                  : Set the system time\n");
+	printf("13. lock     [filename]   : Lock the file\n");
+	printf("14. unlock   [filename]   : Unlock the file\n");
+	printf("15. game                  : Show the game list\n");
+	printf("16. time                  : Show the system current time\n");
+	printf("17. messageA/B/C          : Send message to the terminal A or B or C\n");
+	printf("18. processA/B/C          : Switch to the terminal A or B or C\n");
+	printf("19. calendar              : A calendar application\n");
 	printf("==============================================================================\n");
 }
 

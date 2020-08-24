@@ -10,6 +10,9 @@
 #include "global.h"
 #include "keyboard.h"
 #include "proto.h"
+#include"file.h"
+
+int fileNumber = 0;
 
 PUBLIC void HideFile(char* path, char* file, int op)
 {
@@ -22,18 +25,74 @@ PUBLIC void HideFile(char* path, char* file, int op)
         printf("File %s does not exist!\n", file);
         return;
     }
-    struct inode* new_inode;  // 指向每一个被遍历到的节点
-    for (new_inode = &inode_table[0]; new_inode < &inode_table[NR_INODE]; new_inode++)
+    if (op == 1 && blocks[inode].hide ==1 )
     {
-        if (new_inode->i_num == inode)
-        {
-            break;
-        }
+        blocks[inode].hide = 0;
+    }
+    else if (op == 0 && blocks[inode].hide == 0)
+    {
+        blocks[inode].hide = 1;
+    }
+    else
+    {
+        printf("%s file %s failed!\n", op == 1 ? "Show" : "Hide", file);
+        return;
     }
 
-    new_inode->hide = op;
-
     printf("%s file %s success!\n", op == 1 ? "Show" : "Hide", file);
+}
+
+void LockFile(char* path, char* file,int fd_stdin)
+{
+    char pathName[MAX_PATH];
+    char fileName[20];
+
+    int inode = search_file(file);
+    if (inode == 0)
+    {
+        printf("File %s does not exist!\n", file);
+        return;
+    }
+    blocks[inode].lock = 1;
+
+    char szCmd[17] = { 0 };
+    printf("Please set the password(no more than 16):");
+    int n = read(fd_stdin, szCmd, 17);
+    szCmd[n] = 0;
+
+    strcpy(blocks[inode].pwd, szCmd);
+    printf("%s\n", blocks[inode].pwd);
+
+    printf("Lock file %s success!\n", file);
+}
+
+void UnlockFile(char* path, char* file, int fd_stdin)
+{
+    char pathName[MAX_PATH];
+    char fileName[20];
+
+    int inode = search_file(file);
+    if (inode == 0)
+    {
+        printf("File %s does not exist!\n", file);
+        return;
+    }
+
+    char szCmd[17] = { 0 };
+    printf("Please input the current password:");
+    int n = read(fd_stdin, szCmd, 17);
+    szCmd[n] = 0;
+
+    if (strcmp(blocks[inode].pwd, szCmd) == 0)
+    {
+        blocks[inode].lock = 0;
+        printf("Unlock file %s success!\n", file);
+    }
+    else 
+    {
+        printf("Wrong password!\n");
+
+    }
 }
 
 PUBLIC void CreateFile(char* path, char* file)
@@ -66,8 +125,29 @@ PUBLIC void DeleteFile(char* path, char* file)
         printf("Failed to delete %s!\n", file);
 }
 
-void ReadFile(char* path, char* file)
+void ReadFile(char* path, char* file,int fd_stdin)
 {
+    int inode = search_file(file);
+    if (inode == 0)
+    {
+        printf("File %s does not exist!\n", file);
+        return;
+    }
+
+    if (blocks[inode].lock == 1)//文件被上锁
+    {
+        char szCmd[17] = { 0 };
+        printf("Please input the current password:");
+        int n = read(fd_stdin, szCmd, 17);
+        szCmd[n] = 0;
+
+        if (strcmp(blocks[inode].pwd, szCmd) != 0)
+        {
+            printf("Wrong password!\n");
+            return;
+        }
+    }
+
     char absoPath[512];
     convert_to_absolute(absoPath, path, file);
     int fd = open(absoPath, O_RDWR);
@@ -90,8 +170,29 @@ void ReadFile(char* path, char* file)
     close(fd);
 }
 
-PUBLIC void WriteFile(char* path, char* file)
+PUBLIC void WriteFile(char* path, char* file,int fd_stdin)
 {
+    int inode = search_file(file);
+    if (inode == 0)
+    {
+        printf("File %s does not exist!\n", file);
+        return;
+    }
+
+    if (blocks[inode].lock == 1)//文件被上锁
+    {
+        char szCmd[17] = { 0 };
+        printf("Please input the current password:");
+        int n = read(fd_stdin, szCmd, 17);
+        szCmd[n] = 0;
+
+        if (strcmp(blocks[inode].pwd, szCmd) != 0)
+        {
+            printf("Wrong password!\n");
+            return;
+        }
+    }
+
     char absoPath[512];
     convert_to_absolute(absoPath, path, file);
     int fd = open(absoPath, O_RDWR);
@@ -101,8 +202,8 @@ PUBLIC void WriteFile(char* path, char* file)
         return;
     }
 
-    char tty_name[] = "/dev_tty0";
-    int fd_stdin = open(tty_name, O_RDWR);
+    //char tty_name[] = "/dev_tty0";
+    //int fd_stdin = open(tty_name, O_RDWR);
     if (fd_stdin == -1)
     {
         printf("An error has occured in writing the file!\n");
@@ -193,3 +294,126 @@ PUBLIC void GoDir(char* path, char* file)
     else
         memcpy(path, absoPath, 512);
 }
+
+void toStr3(char* temp, int i) {
+    if (i / 100 < 0)
+        temp[0] = (char)48;
+    else
+        temp[0] = (char)(i / 100 + 48);
+    if ((i % 100) / 10 < 0)
+        temp[1] = '0';
+    else
+        temp[1] = (char)((i % 100) / 10 + 48);
+    temp[2] = (char)(i % 10 + 48);
+}
+
+int toInt(char* temp) {
+    int result = 0;
+    for (int i = 0; i < 3; i++)
+        result = result * 10 + (int)temp[i] - 48;
+    return result;
+}
+
+void InitBlock(int inode_nr) {
+    blocks[inode_nr].inode_nr = inode_nr;
+    blocks[inode_nr].hide = 0;
+    blocks[inode_nr].lock = 0;
+}
+
+void WriteDisk(int len) {
+
+    char temp[MAX_FILE_NUM * 30];
+    int i = 0;
+    temp[i] = '^';
+    i++;
+    toStr3(temp + i, fileNumber);
+    i += 3;
+    temp[i] = '^';
+    i++;
+    for (int j = 0; j < MAX_FILE_NUM; j++) {
+        if (blocks[j].inode_nr >0) {
+            toStr3(temp + i, blocks[j].inode_nr);//inode num
+            i = i + 3;
+            temp[i] = '^';
+            i++;
+
+            toStr3(temp + i, blocks[j].hide);//hide flag
+            i = i + 1;
+            temp[i] = '^';
+            i++;
+
+            toStr3(temp + i, blocks[j].lock);//block flag
+            i = i + 1;
+            temp[i] = '^';
+            i++;
+
+            for (int h = 0; h < strlen(blocks[j].pwd); h++) {//pwd
+                temp[i + h] = blocks[j].pwd[h];
+                if (blocks[j].pwd[h] == '^')
+                    temp[i + h] = (char)1;
+            }
+            i = i + strlen(blocks[j].pwd);
+            temp[i] = '^';
+            i++;
+        }
+    }
+    
+    printl("%s\n", temp);
+
+    int fd = 0;
+    int n1 = 0;
+    fd = open("ss", O_RDWR);
+    assert(fd != -1);
+    n1 = write(fd, temp, strlen(temp));
+    assert(n1 == strlen(temp));
+    close(fd);
+}
+
+int ReadDisk() {
+    char bufr[1000];
+    int fd = 0;
+    int n1 = 0;
+    fd = open("ss", O_RDWR);
+    assert(fd != -1);
+    n1 = read(fd, bufr, 1000);
+    bufr[n1] = 0;
+    int r = 1;
+    fileNumber = toInt(bufr + r);
+    r = r + 4;
+    for (int i = 0; i < fileNumber; i++) {
+        int ID = toInt(bufr + r);
+
+        blocks[ID].inode_nr = ID;
+        r = r + 4;
+        
+        blocks[ID].hide = toInt(bufr + r);
+        r = r + 2;
+
+        blocks[ID].lock = toInt(bufr + r);
+        r = r + 2;
+
+        if (blocks[ID].lock == 1)
+        {
+            for (int i = 0; i < MAX_PWD_LENGTH; i++) {
+                if (bufr[r] == '^')
+                    break;
+                else if (bufr[r] == (char)1)
+                    blocks[ID].pwd[i] = '^';
+                else
+                    blocks[ID].pwd[i] = bufr[r];
+                r++;
+            }
+        }
+        r++;
+    }
+    return n1;
+}
+
+void DeleteBlock(int ID) {
+    blocks[ID].inode_nr = -2;
+    blocks[ID].hide = -1;
+    blocks[ID].lock = -1;
+    for (int i = 0; i < MAX_FILE_NUM; i++)
+        blocks[ID].pwd[i] = '\0';
+}
+
