@@ -849,7 +849,6 @@ void help()
 	printf("10. cd       [dirname]    : Go to a directory in current directory\n");
 	printf("11. hide     [filename]   : Hide a file \n");
 	printf("12. show     [filename]   : Unhide a file \n");
-<<<<<<< HEAD
 	printf("13. lock     [filename]   : Lock the file\n");
 	printf("14. unlock   [filename]   : Unlock the file\n");
 	printf("15. game                  : Show the game list\n");
@@ -857,13 +856,6 @@ void help()
 	printf("17. messageA/B/C          : Send message to the terminal A or B or C\n");
 	printf("18. processA/B/C          : Switch to the terminal A or B or C\n");
 	printf("19. calendar              : A calendar application\n");
-=======
-	printf("13. game                  : Show the game list\n");
-	printf("15. messageA/B/C          : Send message to the terminal A or B or C\n");
-	printf("16. processA/B/C          : Switch to the terminal A or B or C\n");
-	printf("17. calendar              : A calendar application\n");
-	printf("18. time                  : Set the system time\n");
->>>>>>> c4972a6a7cd461e9ae27627c163cbe382dbcd957
 	printf("==============================================================================\n");
 }
 
