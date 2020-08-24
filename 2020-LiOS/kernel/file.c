@@ -362,7 +362,7 @@ void WriteDisk(int len) {
 
     int fd = 0;
     int n1 = 0;
-    fd = open("ss", O_RDWR);
+    fd = open("dev_tty3", O_RDWR);
     assert(fd != -1);
     n1 = write(fd, temp, strlen(temp));
     assert(n1 == strlen(temp));
@@ -373,7 +373,7 @@ int ReadDisk() {
     char bufr[1000];
     int fd = 0;
     int n1 = 0;
-    fd = open("ss", O_RDWR);
+    fd = open("dev_tty3", O_RDWR);
     assert(fd != -1);
     n1 = read(fd, bufr, 1000);
     bufr[n1] = 0;
