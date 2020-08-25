@@ -24,11 +24,13 @@ PUBLIC void start2048Game(int fd_stdin, int fd_stdout) {
     // Specify the rules of the game
     
     clear();
-    printf("Welcome to 2048 Game!\n\n\n");
-    printf("Control:\n");
-    printf("             LEFT: a    RIGHT: d\n");
-    printf("             UP:   w    DOWN:  s\n");
-    printf("             EXIT: press enter  \n\n\n");
+    printf("Welcome to 2048 Game!£¡£¡\n\n\n");
+    printf("Help:\n");
+    printf("             LEFT:    a \n");
+    printf("             RIGHT:   d\n");
+    printf("             UP:      w\n");
+    printf("             DOWN:    s\n");
+    printf("             EXIT:  enter\n\n\n");
     // Initialize the data
     initData();
 
