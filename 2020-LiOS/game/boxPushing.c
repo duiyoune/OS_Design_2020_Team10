@@ -48,7 +48,7 @@ int boxPushing(int fd_stdin,int fd_stdout)
 
 	{
 
-		//clear();
+		clear();
 
 		drawmain();
 
